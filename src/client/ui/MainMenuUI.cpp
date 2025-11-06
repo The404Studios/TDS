@@ -7,7 +7,7 @@
 #include <cmath>
 
 void MainMenuUI::update(float deltaTime) {
-    // Update animation time
+    // Update animation
     animTime += deltaTime;
 
     // Process packets if needed
@@ -27,185 +27,220 @@ void MainMenuUI::update(float deltaTime) {
 
 void MainMenuUI::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.08f, 0.08f, 0.12f, 1.0f);
     glLoadIdentity();
 
-    // Calculate pulse effect for title
-    float pulse = 0.8f + 0.2f * std::sin(animTime * 2.0f);
+    // Animated title
+    float pulse = 0.85f + 0.15f * std::sin(animTime * 2.0f);
+    glColor3f(pulse, pulse * 0.85f, pulse * 0.5f);
+    TextRenderer::drawTextCentered("EXTRACTION SHOOTER", 0.8f, 2.2f);
 
-    // Draw animated title with glow effect
-    glColor3f(pulse, pulse * 0.9f, 0.5f);
-    TextRenderer::drawTextCentered("EXTRACTION SHOOTER", 0.85f, 1.8f);
-    glColor3f(0.7f, 0.7f, 0.7f);
-    TextRenderer::drawTextCentered("MAIN MENU", 0.7f, 1.2f);
+    glColor3f(0.65f, 0.65f, 0.65f);
+    TextRenderer::drawTextCentered("MAIN MENU", 0.65f, 1.4f);
 
-    // Define button layout with proper spacing
-    float buttonWidth = 0.5f;
-    float buttonHeight = 0.12f;
-    float buttonSpacing = 0.02f;
-    float centerX = -buttonWidth / 2.0f;
-    float startY = 0.4f;
+    // Player stats card (top right)
+    float statsX = 0.4f;
+    float statsY = 0.35f;
+    float statsW = 0.5f;
+    float statsH = 0.45f;
 
-    // Button labels
-    std::vector<std::string> buttonLabels = {
-        "ENTER LOBBY",
-        "VIEW STASH",
-        "VISIT MERCHANTS",
-        "LOGOUT"
-    };
+    // Shadow
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+    drawBox(statsX + 0.015f, statsY - 0.015f, statsW, statsH, true);
 
-    // Button descriptions for info panel
-    std::vector<std::string> buttonDescriptions = {
-        "Create or join a party to enter raids|Queue with friends for cooperative extraction gameplay",
-        "Manage your persistent inventory|Store weapons, armor, loot, and other items here",
-        "Buy and sell items from traders|5 merchants: Fence, Prapor, Therapist, Peacekeeper, Ragman",
-        "Disconnect and return to login screen|Your progress will be saved automatically"
-    };
+    // Card background
+    glColor4f(0.12f, 0.12f, 0.16f, 0.95f);
+    drawBox(statsX, statsY, statsW, statsH, true);
 
-    // Draw buttons with animations
-    for (size_t i = 0; i < buttonLabels.size(); i++) {
-        float btnY = startY - i * (buttonHeight + buttonSpacing);
-        bool isHovering = isPointInRect(mouseX, mouseY, centerX, btnY, buttonWidth, buttonHeight);
+    glColor3f(0.4f, 0.35f, 0.25f);
+    glLineWidth(2.0f);
+    drawBox(statsX, statsY, statsW, statsH, false);
+    glLineWidth(1.0f);
+    glDisable(GL_BLEND);
 
-        // Animate button on hover
-        float hoverScale = isHovering ? 1.05f : 1.0f;
-        float btnWidth = buttonWidth * hoverScale;
-        float btnHeight = buttonHeight * hoverScale;
-        float btnX = centerX - (btnWidth - buttonWidth) / 2.0f;
-        float adjustedY = btnY - (btnHeight - buttonHeight) / 2.0f;
+    // Stats title
+    glColor3f(0.9f, 0.75f, 0.5f);
+    TextRenderer::drawText("PLAYER STATS", statsX + 0.03f, statsY + statsH - 0.06f, 1.1f);
 
-        // Draw button background with gradient effect
-        if (isHovering) {
-            glColor3f(0.25f, 0.45f, 0.75f);  // Bright blue on hover
-        } else if ((int)i == selectedOption) {
-            glColor3f(0.2f, 0.35f, 0.6f);   // Medium blue when selected
-        } else {
-            glColor3f(0.15f, 0.15f, 0.2f);  // Dark background
-        }
-        drawBox(btnX, adjustedY, btnWidth, btnHeight, true);
+    // Stats content
+    float statY = statsY + statsH - 0.15f;
+    glColor3f(0.8f, 0.8f, 0.8f);
+    TextRenderer::drawText("Level:", statsX + 0.03f, statY, 0.9f);
+    glColor3f(0.5f, 1.0f, 0.5f);
+    TextRenderer::drawText(std::to_string(playerStats.level), statsX + 0.25f, statY, 0.9f);
 
-        // Draw button border with glow on hover
-        if (isHovering) {
-            float glowPulse = 0.7f + 0.3f * std::sin(animTime * 8.0f);
-            glColor3f(glowPulse, glowPulse * 0.8f, 1.0f);
-            glLineWidth(3.0f);
-        } else {
-            glColor3f(0.5f, 0.5f, 0.6f);
-            glLineWidth(2.0f);
-        }
-        drawBox(btnX, adjustedY, btnWidth, btnHeight, false);
-        glLineWidth(1.0f);
+    statY -= 0.08f;
+    glColor3f(0.8f, 0.8f, 0.8f);
+    TextRenderer::drawText("Roubles:", statsX + 0.03f, statY, 0.9f);
+    glColor3f(1.0f, 0.9f, 0.5f);
+    TextRenderer::drawText(std::to_string(playerStats.roubles), statsX + 0.25f, statY, 0.9f);
 
-        // Draw button text (centered)
-        glColor3f(1.0f, 1.0f, 1.0f);
-        float textX = centerX + buttonWidth / 2.0f - buttonLabels[i].length() * 0.007f;
-        float textY = btnY + buttonHeight / 2.0f - 0.02f;
-        TextRenderer::drawText(buttonLabels[i], textX, textY, 1.0f);
-
-        // Update selected option on hover
-        if (isHovering) {
-            selectedOption = static_cast<int>(i);
-        }
-    }
-
-    // Draw player stats panel (left side with proper spacing)
-    float panelMargin = 0.05f;
-    float statsPanelX = -0.88f;
-    float statsPanelY = -0.15f;
-    float statsPanelW = 0.35f;
-    float statsPanelH = 0.45f;
-
-    drawPanel(statsPanelX, statsPanelY, statsPanelW, statsPanelH, "PLAYER STATS");
-
-    // Draw stats with icons/labels
-    glColor3f(0.9f, 0.9f, 0.9f);
-    float statsTextX = statsPanelX + 0.02f;
-    float statsY = statsPanelY + 0.35f;
-
-    glColor3f(0.7f, 0.9f, 0.7f);
-    TextRenderer::drawText("LEVEL", statsTextX, statsY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    TextRenderer::drawText(std::to_string(playerStats.level), statsTextX + 0.15f, statsY);
-
-    statsY -= 0.08f;
-    glColor3f(0.9f, 0.9f, 0.5f);
-    TextRenderer::drawText("ROUBLES", statsTextX, statsY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    TextRenderer::drawText(std::to_string(playerStats.roubles), statsTextX + 0.15f, statsY);
-
-    statsY -= 0.08f;
+    statY -= 0.08f;
+    glColor3f(0.8f, 0.8f, 0.8f);
+    TextRenderer::drawText("Raids:", statsX + 0.03f, statY, 0.9f);
     glColor3f(0.6f, 0.8f, 1.0f);
-    TextRenderer::drawText("RAIDS", statsTextX, statsY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    TextRenderer::drawText(std::to_string(playerStats.raidsCompleted), statsTextX + 0.15f, statsY);
+    TextRenderer::drawText(std::to_string(playerStats.raidsCompleted), statsX + 0.25f, statY, 0.9f);
 
-    statsY -= 0.08f;
-    glColor3f(1.0f, 0.6f, 0.6f);
-    TextRenderer::drawText("K/D RATIO", statsTextX, statsY);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    statY -= 0.08f;
+    glColor3f(0.8f, 0.8f, 0.8f);
+    TextRenderer::drawText("K/D:", statsX + 0.03f, statY, 0.9f);
     float kd = playerStats.deaths > 0 ? (float)playerStats.kills / playerStats.deaths : (float)playerStats.kills;
     char kdStr[32];
     sprintf_s(kdStr, "%.2f", kd);
-    TextRenderer::drawText(kdStr, statsTextX + 0.15f, statsY);
+    glColor3f(1.0f, 0.7f, 0.7f);
+    TextRenderer::drawText(kdStr, statsX + 0.25f, statY, 0.9f);
 
-    // Draw information panel (right side)
-    float infoPanelX = 0.53f;
-    float infoPanelY = -0.15f;
-    float infoPanelW = 0.35f;
-    float infoPanelH = 0.45f;
+    // Button grid (2x2) - properly spaced and centered
+    float btnW = 0.35f;
+    float btnH = 0.13f;
+    float gridGap = 0.03f;  // Gap between buttons
+    float totalW = btnW * 2 + gridGap;
+    float totalH = btnH * 2 + gridGap;
+    float gridX = -totalW / 2.0f;
+    float gridY = 0.1f;
 
-    drawPanel(infoPanelX, infoPanelY, infoPanelW, infoPanelH, "INFORMATION");
+    // Button data
+    struct ButtonData {
+        std::string text;
+        int index;
+        float x, y;
+    };
 
-    // Display info for selected/hovered button
-    glColor3f(0.85f, 0.85f, 0.85f);
-    std::string desc = buttonDescriptions[selectedOption];
-    size_t pipePos = desc.find('|');
+    ButtonData buttons[4] = {
+        {"ENTER LOBBY", 0, gridX, gridY},
+        {"VIEW STASH", 1, gridX + btnW + gridGap, gridY},
+        {"MERCHANTS", 2, gridX, gridY - btnH - gridGap},
+        {"LOGOUT", 3, gridX + btnW + gridGap, gridY - btnH - gridGap}
+    };
 
-    if (pipePos != std::string::npos) {
-        std::string line1 = desc.substr(0, pipePos);
-        std::string line2 = desc.substr(pipePos + 1);
+    // Draw all buttons
+    for (int i = 0; i < 4; i++) {
+        ButtonData& btn = buttons[i];
+        bool isHover = isPointInRect(mouseX, mouseY, btn.x, btn.y, btnW, btnH);
 
-        float infoTextX = infoPanelX + 0.02f;
-        TextRenderer::drawText(line1, infoTextX, infoPanelY + 0.35f);
-        TextRenderer::drawText(line2, infoTextX, infoPanelY + 0.25f);
+        // Shadow
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
+        drawBox(btn.x + 0.01f, btn.y - 0.01f, btnW, btnH, true);
+
+        // Button background
+        if (isHover) {
+            float hoverPulse = 0.3f + 0.1f * std::sin(animTime * 6.0f);
+            glColor4f(0.25f + hoverPulse, 0.45f + hoverPulse, 0.75f + hoverPulse, 0.95f);
+        } else if (btn.index == selectedOption) {
+            glColor4f(0.22f, 0.4f, 0.65f, 0.95f);
+        } else {
+            glColor4f(0.15f, 0.15f, 0.2f, 0.95f);
+        }
+        drawBox(btn.x, btn.y, btnW, btnH, true);
+
+        // Button border
+        if (isHover) {
+            float glowPulse = 0.6f + 0.4f * std::sin(animTime * 8.0f);
+            glColor3f(glowPulse, glowPulse * 0.85f, 1.0f);
+            glLineWidth(3.0f);
+        } else {
+            glColor3f(0.4f, 0.4f, 0.5f);
+            glLineWidth(2.0f);
+        }
+        drawBox(btn.x, btn.y, btnW, btnH, false);
+        glLineWidth(1.0f);
+        glDisable(GL_BLEND);
+
+        // Button text - properly centered
+        glColor3f(1.0f, 1.0f, 1.0f);
+        float textX = btn.x + btnW / 2.0f - btn.text.length() * 0.0075f;
+        float textY = btn.y + btnH / 2.0f - 0.02f;
+        TextRenderer::drawText(btn.text, textX, textY, 1.0f);
+
+        // Update selected option on hover
+        if (isHover) {
+            selectedOption = btn.index;
+        }
     }
 
-    // Draw footer with controls and version info
-    glColor3f(0.5f, 0.5f, 0.5f);
-    TextRenderer::drawText("v1.0.0 Alpha", -0.88f, -0.9f, 0.9f);
+    // Information panel (bottom)
+    float infoX = -0.7f;
+    float infoY = -0.7f;
+    float infoW = 1.4f;
+    float infoH = 0.25f;
 
-    glColor3f(0.6f, 0.6f, 0.7f);
-    TextRenderer::drawText("Click buttons or use Arrow Keys + Enter", 0.15f, -0.9f, 0.9f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.3f);
+    drawBox(infoX + 0.01f, infoY - 0.01f, infoW, infoH, true);
+
+    glColor4f(0.1f, 0.1f, 0.12f, 0.9f);
+    drawBox(infoX, infoY, infoW, infoH, true);
+
+    glColor3f(0.35f, 0.35f, 0.4f);
+    glLineWidth(1.5f);
+    drawBox(infoX, infoY, infoW, infoH, false);
+    glLineWidth(1.0f);
+    glDisable(GL_BLEND);
+
+    // Info content based on selection
+    glColor3f(0.85f, 0.85f, 0.85f);
+    const char* infoTexts[4][2] = {
+        {"ENTER LOBBY", "Create or join a party to enter raids. Queue with friends for cooperative gameplay."},
+        {"VIEW STASH", "Manage your persistent inventory. Store weapons, armor, and loot between raids."},
+        {"MERCHANTS", "Trade with merchants. Buy gear, sell loot, and complete quests for better prices."},
+        {"LOGOUT", "Disconnect and return to login screen. Your progress will be saved automatically."}
+    };
+
+    TextRenderer::drawText(infoTexts[selectedOption][0], infoX + 0.03f, infoY + infoH - 0.07f, 1.1f);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    TextRenderer::drawText(infoTexts[selectedOption][1], infoX + 0.03f, infoY + infoH - 0.15f, 0.85f);
+
+    // Footer
+    glColor3f(0.45f, 0.45f, 0.45f);
+    TextRenderer::drawText("v1.0.0 Alpha", -0.88f, -0.92f, 0.7f);
+    TextRenderer::drawText("Click any button to continue", 0.3f, -0.92f, 0.7f);
 }
 
 void MainMenuUI::handleInput(char key) {
-    // Up arrow or W
-    if (key == 'w' || key == 'W' || key == -32) {
+    // Up/Down - cycle options
+    if (key == 'w' || key == 'W' || key == 72) {  // W or Up arrow
         selectedOption = (selectedOption - 1 + 4) % 4;
     }
-
-    // Down arrow or S
-    if (key == 's' || key == 'S') {
+    if (key == 's' || key == 'S' || key == 80) {  // S or Down arrow
         selectedOption = (selectedOption + 1) % 4;
     }
 
-    // Enter or Space
-    if (key == '\r' || key == '\n' || key == 13 || key == ' ') {
+    // Enter - select
+    if (key == '\r' || key == '\n' || key == 13) {
+        selectOption();
+    }
+
+    // Number keys 1-4
+    if (key >= '1' && key <= '4') {
+        selectedOption = key - '1';
         selectOption();
     }
 }
 
 void MainMenuUI::handleMouseClick(float x, float y) {
-    float buttonWidth = 0.5f;
-    float buttonHeight = 0.12f;
-    float buttonSpacing = 0.02f;
-    float centerX = -buttonWidth / 2.0f;
-    float startY = 0.4f;
+    // Button dimensions
+    float btnW = 0.35f;
+    float btnH = 0.13f;
+    float gridGap = 0.03f;
+    float totalW = btnW * 2 + gridGap;
+    float gridX = -totalW / 2.0f;
+    float gridY = 0.1f;
 
-    // Check each button
+    // Check all 4 buttons
+    float positions[4][2] = {
+        {gridX, gridY},
+        {gridX + btnW + gridGap, gridY},
+        {gridX, gridY - btnH - gridGap},
+        {gridX + btnW + gridGap, gridY - btnH - gridGap}
+    };
+
     for (int i = 0; i < 4; i++) {
-        float btnY = startY - i * (buttonHeight + buttonSpacing);
-
-        if (isPointInRect(x, y, centerX, btnY, buttonWidth, buttonHeight)) {
+        if (isPointInRect(x, y, positions[i][0], positions[i][1], btnW, btnH)) {
             selectedOption = i;
             selectOption();
             return;
@@ -225,7 +260,7 @@ void MainMenuUI::selectOption() {
             changeState = true;
             break;
 
-        case 2:  // Visit Merchants
+        case 2:  // Merchants
             nextState = UIState::MERCHANT;
             changeState = true;
             break;

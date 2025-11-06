@@ -9,9 +9,9 @@
 // Login/Register UI
 class LoginUI : public BaseUI {
 public:
-    LoginUI(NetworkClient* netClient) : networkClient(netClient), mode(Mode::LOGIN),
-                                         selectedField(0), waitingForResponse(false),
-                                         accountId(0) {}
+    LoginUI(NetworkClient* netClient)
+        : networkClient(netClient), accountId(0), selectedField(0),
+          mode(Mode::LOGIN), waitingForResponse(false), animTime(0.0f) {}
 
     void update(float deltaTime) override;
     void render() override;
@@ -29,20 +29,21 @@ private:
     };
 
     NetworkClient* networkClient;
-    Mode mode;
+    uint64_t accountId;
     int selectedField;
+    Mode mode;
+    bool waitingForResponse;
     std::string username;
     std::string password;
     std::string email;
     std::string errorMessage;
     std::string statusMessage;
-    bool waitingForResponse;
-    uint64_t accountId;
+    float animTime;
 
     void submitAction();
-    void sendLoginRequest(const std::string& passwordHash);
-    void sendRegisterRequest(const std::string& passwordHash);
+    void toggleMode();
+    void sendLoginRequest();
+    void sendRegisterRequest();
     void handleLoginResponse(const std::vector<uint8_t>& payload);
     void handleRegisterResponse(const std::vector<uint8_t>& payload);
-    void toggleMode();
 };
