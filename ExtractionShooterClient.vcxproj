@@ -165,6 +165,10 @@
     <ClCompile Include="src\client\ui\UIButton.cpp" />
     <ClCompile Include="src\client\ui\LoginScene.cpp" />
     <ClCompile Include="src\client\ui\MainMenuScene.cpp" />
+    <!-- New Advanced Components -->
+    <ClCompile Include="src\client\ui\UIInputField.cpp" />
+    <ClCompile Include="src\client\ui\Animation.cpp" />
+    <ClCompile Include="src\client\ui\EventSystem.cpp" />
   </ItemGroup>
   <!-- Header Files - Common -->
   <ItemGroup>
@@ -193,6 +197,10 @@
     <ClInclude Include="src\client\ui\UIButton.h" />
     <ClInclude Include="src\client\ui\LoginScene.h" />
     <ClInclude Include="src\client\ui\MainMenuScene.h" />
+    <!-- New Advanced Component Headers -->
+    <ClInclude Include="src\client\ui\UIInputField.h" />
+    <ClInclude Include="src\client\ui\Animation.h" />
+    <ClInclude Include="src\client\ui\EventSystem.h" />
   </ItemGroup>
   <!-- Documentation -->
   <ItemGroup>
