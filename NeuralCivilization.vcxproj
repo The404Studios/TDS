@@ -168,11 +168,19 @@
     <ClCompile Include="CivilizationAI.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="GameplayFeatures.cpp" />
+    <ClCompile Include="TerrainManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CivilizationAI.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="GameplayFeatures.h" />
+    <ClInclude Include="TerrainManager.h" />
+    <ClInclude Include="PlayerCharacter.h" />
+    <ClInclude Include="GameUI.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+    <None Include="FPS_README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
