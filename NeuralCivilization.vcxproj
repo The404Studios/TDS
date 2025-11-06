@@ -164,12 +164,18 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="CivilizationAI.cpp" />
-    <ClCompile Include="main_windows.cpp" />
+    <ClCompile Include="ZombieGameMain.cpp" />
+    <ClCompile Include="ZombieGame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CivilizationAI.h" />
+    <ClInclude Include="ZombieGame.h" />
+  </ItemGroup>
+  <!-- Original civilization game files (excluded from build) -->
+  <ItemGroup>
+    <None Include="main.cpp" />
+    <None Include="CivilizationAI.cpp" />
+    <None Include="main_windows.cpp" />
+    <None Include="CivilizationAI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
