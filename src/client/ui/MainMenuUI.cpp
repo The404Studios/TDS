@@ -4,8 +4,12 @@
 #include <windows.h>
 #include <gl/GL.h>
 #include <cstring>
+#include <cmath>
 
 void MainMenuUI::update(float deltaTime) {
+    // Update animation time
+    animTime += deltaTime;
+
     // Process packets if needed
     while (networkClient->hasPackets()) {
         auto packet = networkClient->getNextPacket();
@@ -25,65 +29,157 @@ void MainMenuUI::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    // Draw title
-    glColor3f(1.0f, 1.0f, 1.0f);
-    TextRenderer::drawTextCentered("EXTRACTION SHOOTER - MAIN MENU", 0.9f, 1.5f);
+    // Calculate pulse effect for title
+    float pulse = 0.8f + 0.2f * std::sin(animTime * 2.0f);
 
-    // Draw player stats panel
-    drawPanel(-0.7f, 0.4f, 0.6f, 0.4f, "Player Stats");
+    // Draw animated title with glow effect
+    glColor3f(pulse, pulse * 0.9f, 0.5f);
+    TextRenderer::drawTextCentered("EXTRACTION SHOOTER", 0.85f, 1.8f);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    TextRenderer::drawTextCentered("MAIN MENU", 0.7f, 1.2f);
 
-    glColor3f(1.0f, 1.0f, 1.0f);
-    TextRenderer::drawText("Level: " + std::to_string(playerStats.level), -0.65f, 0.65f);
-    TextRenderer::drawText("Roubles: " + std::to_string(playerStats.roubles), -0.65f, 0.55f);
-    TextRenderer::drawText("Raids: " + std::to_string(playerStats.raidsCompleted), -0.65f, 0.45f);
+    // Define button layout with proper spacing
+    float buttonWidth = 0.5f;
+    float buttonHeight = 0.12f;
+    float buttonSpacing = 0.02f;
+    float centerX = -buttonWidth / 2.0f;
+    float startY = 0.4f;
 
-    // Draw menu options panel
-    drawPanel(-0.05f, 0.4f, 0.6f, 0.4f, "Menu");
-
-    std::vector<std::string> options = {
-        "1. View Stash",
-        "2. Visit Merchants",
-        "3. Enter Lobby",
-        "4. Logout"
+    // Button labels
+    std::vector<std::string> buttonLabels = {
+        "ENTER LOBBY",
+        "VIEW STASH",
+        "VISIT MERCHANTS",
+        "LOGOUT"
     };
 
-    float yPos = 0.65f;
-    for (size_t i = 0; i < options.size(); i++) {
-        if ((int)i == selectedOption) {
-            glColor3f(0.3f, 1.0f, 0.3f);  // Highlight selected
-            TextRenderer::drawText("> " + options[i], 0.0f, yPos);
+    // Button descriptions for info panel
+    std::vector<std::string> buttonDescriptions = {
+        "Create or join a party to enter raids|Queue with friends for cooperative extraction gameplay",
+        "Manage your persistent inventory|Store weapons, armor, loot, and other items here",
+        "Buy and sell items from traders|5 merchants: Fence, Prapor, Therapist, Peacekeeper, Ragman",
+        "Disconnect and return to login screen|Your progress will be saved automatically"
+    };
+
+    // Draw buttons with animations
+    for (size_t i = 0; i < buttonLabels.size(); i++) {
+        float btnY = startY - i * (buttonHeight + buttonSpacing);
+        bool isHovering = isPointInRect(mouseX, mouseY, centerX, btnY, buttonWidth, buttonHeight);
+
+        // Animate button on hover
+        float hoverScale = isHovering ? 1.05f : 1.0f;
+        float btnWidth = buttonWidth * hoverScale;
+        float btnHeight = buttonHeight * hoverScale;
+        float btnX = centerX - (btnWidth - buttonWidth) / 2.0f;
+        float adjustedY = btnY - (btnHeight - buttonHeight) / 2.0f;
+
+        // Draw button background with gradient effect
+        if (isHovering) {
+            glColor3f(0.25f, 0.45f, 0.75f);  // Bright blue on hover
+        } else if ((int)i == selectedOption) {
+            glColor3f(0.2f, 0.35f, 0.6f);   // Medium blue when selected
         } else {
-            glColor3f(0.8f, 0.8f, 0.8f);
-            TextRenderer::drawText("  " + options[i], 0.0f, yPos);
+            glColor3f(0.15f, 0.15f, 0.2f);  // Dark background
         }
-        yPos -= 0.1f;
+        drawBox(btnX, adjustedY, btnWidth, btnHeight, true);
+
+        // Draw button border with glow on hover
+        if (isHovering) {
+            float glowPulse = 0.7f + 0.3f * std::sin(animTime * 8.0f);
+            glColor3f(glowPulse, glowPulse * 0.8f, 1.0f);
+            glLineWidth(3.0f);
+        } else {
+            glColor3f(0.5f, 0.5f, 0.6f);
+            glLineWidth(2.0f);
+        }
+        drawBox(btnX, adjustedY, btnWidth, btnHeight, false);
+        glLineWidth(1.0f);
+
+        // Draw button text (centered)
+        glColor3f(1.0f, 1.0f, 1.0f);
+        float textX = centerX + buttonWidth / 2.0f - buttonLabels[i].length() * 0.007f;
+        float textY = btnY + buttonHeight / 2.0f - 0.02f;
+        TextRenderer::drawText(buttonLabels[i], textX, textY, 1.0f);
+
+        // Update selected option on hover
+        if (isHovering) {
+            selectedOption = static_cast<int>(i);
+        }
     }
 
-    // Draw info panel
-    drawPanel(-0.7f, -0.3f, 1.3f, 0.5f, "Information");
+    // Draw player stats panel (left side with proper spacing)
+    float panelMargin = 0.05f;
+    float statsPanelX = -0.88f;
+    float statsPanelY = -0.15f;
+    float statsPanelW = 0.35f;
+    float statsPanelH = 0.45f;
 
-    glColor3f(0.8f, 0.8f, 0.8f);
-    if (selectedOption == 0) {
-        TextRenderer::drawText("Stash - Manage your persistent inventory", -0.65f, 0.0f);
-        TextRenderer::drawText("Store weapons, armor, loot, and other items here", -0.65f, -0.1f);
-    } else if (selectedOption == 1) {
-        TextRenderer::drawText("Merchants - Buy and sell items", -0.65f, 0.0f);
-        TextRenderer::drawText("5 merchants available: Fence, Prapor, Therapist, Peacekeeper, Ragman", -0.65f, -0.1f);
-    } else if (selectedOption == 2) {
-        TextRenderer::drawText("Lobby - Create or join a party to enter raids", -0.65f, 0.0f);
-        TextRenderer::drawText("Queue with friends for cooperative extraction gameplay", -0.65f, -0.1f);
-    } else if (selectedOption == 3) {
-        TextRenderer::drawText("Logout - Return to login screen", -0.65f, 0.0f);
+    drawPanel(statsPanelX, statsPanelY, statsPanelW, statsPanelH, "PLAYER STATS");
+
+    // Draw stats with icons/labels
+    glColor3f(0.9f, 0.9f, 0.9f);
+    float statsTextX = statsPanelX + 0.02f;
+    float statsY = statsPanelY + 0.35f;
+
+    glColor3f(0.7f, 0.9f, 0.7f);
+    TextRenderer::drawText("LEVEL", statsTextX, statsY);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    TextRenderer::drawText(std::to_string(playerStats.level), statsTextX + 0.15f, statsY);
+
+    statsY -= 0.08f;
+    glColor3f(0.9f, 0.9f, 0.5f);
+    TextRenderer::drawText("ROUBLES", statsTextX, statsY);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    TextRenderer::drawText(std::to_string(playerStats.roubles), statsTextX + 0.15f, statsY);
+
+    statsY -= 0.08f;
+    glColor3f(0.6f, 0.8f, 1.0f);
+    TextRenderer::drawText("RAIDS", statsTextX, statsY);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    TextRenderer::drawText(std::to_string(playerStats.raidsCompleted), statsTextX + 0.15f, statsY);
+
+    statsY -= 0.08f;
+    glColor3f(1.0f, 0.6f, 0.6f);
+    TextRenderer::drawText("K/D RATIO", statsTextX, statsY);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    float kd = playerStats.deaths > 0 ? (float)playerStats.kills / playerStats.deaths : (float)playerStats.kills;
+    char kdStr[32];
+    sprintf_s(kdStr, "%.2f", kd);
+    TextRenderer::drawText(kdStr, statsTextX + 0.15f, statsY);
+
+    // Draw information panel (right side)
+    float infoPanelX = 0.53f;
+    float infoPanelY = -0.15f;
+    float infoPanelW = 0.35f;
+    float infoPanelH = 0.45f;
+
+    drawPanel(infoPanelX, infoPanelY, infoPanelW, infoPanelH, "INFORMATION");
+
+    // Display info for selected/hovered button
+    glColor3f(0.85f, 0.85f, 0.85f);
+    std::string desc = buttonDescriptions[selectedOption];
+    size_t pipePos = desc.find('|');
+
+    if (pipePos != std::string::npos) {
+        std::string line1 = desc.substr(0, pipePos);
+        std::string line2 = desc.substr(pipePos + 1);
+
+        float infoTextX = infoPanelX + 0.02f;
+        TextRenderer::drawText(line1, infoTextX, infoPanelY + 0.35f);
+        TextRenderer::drawText(line2, infoTextX, infoPanelY + 0.25f);
     }
 
-    // Draw controls
-    glColor3f(0.6f, 0.6f, 0.6f);
-    TextRenderer::drawText("Controls: UP/DOWN - Select | ENTER - Confirm", -0.9f, -0.9f, 0.8f);
+    // Draw footer with controls and version info
+    glColor3f(0.5f, 0.5f, 0.5f);
+    TextRenderer::drawText("v1.0.0 Alpha", -0.88f, -0.9f, 0.9f);
+
+    glColor3f(0.6f, 0.6f, 0.7f);
+    TextRenderer::drawText("Click buttons or use Arrow Keys + Enter", 0.15f, -0.9f, 0.9f);
 }
 
 void MainMenuUI::handleInput(char key) {
     // Up arrow or W
-    if (key == 'w' || key == 'W' || key == -32) {  // -32 is arrow key prefix on Windows
+    if (key == 'w' || key == 'W' || key == -32) {
         selectedOption = (selectedOption - 1 + 4) % 4;
     }
 
@@ -92,62 +188,45 @@ void MainMenuUI::handleInput(char key) {
         selectedOption = (selectedOption + 1) % 4;
     }
 
-    // Enter or number keys
-    if (key == '\r' || key == '\n' || key == 13) {
-        selectOption();
-    } else if (key >= '1' && key <= '4') {
-        selectedOption = key - '1';
+    // Enter or Space
+    if (key == '\r' || key == '\n' || key == 13 || key == ' ') {
         selectOption();
     }
 }
 
 void MainMenuUI::handleMouseClick(float x, float y) {
-    // Menu options are displayed starting at y=0.65f with 0.1f spacing
-    // Each option is clickable in a region around the text
+    float buttonWidth = 0.5f;
+    float buttonHeight = 0.12f;
+    float buttonSpacing = 0.02f;
+    float centerX = -buttonWidth / 2.0f;
+    float startY = 0.4f;
 
-    // Option 0: View Stash (y: 0.60 to 0.68)
-    if (isPointInRect(x, y, 0.0f, 0.60f, 0.5f, 0.08f)) {
-        selectedOption = 0;
-        selectOption();
-        return;
-    }
+    // Check each button
+    for (int i = 0; i < 4; i++) {
+        float btnY = startY - i * (buttonHeight + buttonSpacing);
 
-    // Option 1: Visit Merchants (y: 0.50 to 0.58)
-    if (isPointInRect(x, y, 0.0f, 0.50f, 0.5f, 0.08f)) {
-        selectedOption = 1;
-        selectOption();
-        return;
-    }
-
-    // Option 2: Enter Lobby (y: 0.40 to 0.48)
-    if (isPointInRect(x, y, 0.0f, 0.40f, 0.5f, 0.08f)) {
-        selectedOption = 2;
-        selectOption();
-        return;
-    }
-
-    // Option 3: Logout (y: 0.30 to 0.38)
-    if (isPointInRect(x, y, 0.0f, 0.30f, 0.5f, 0.08f)) {
-        selectedOption = 3;
-        selectOption();
-        return;
+        if (isPointInRect(x, y, centerX, btnY, buttonWidth, buttonHeight)) {
+            selectedOption = i;
+            selectOption();
+            return;
+        }
     }
 }
 
 void MainMenuUI::selectOption() {
     switch (selectedOption) {
-        case 0:  // View Stash
+        case 0:  // Enter Lobby
+            nextState = UIState::LOBBY;
+            changeState = true;
+            break;
+
+        case 1:  // View Stash
             nextState = UIState::STASH;
             changeState = true;
             break;
 
-        case 1:  // Visit Merchants
+        case 2:  // Visit Merchants
             nextState = UIState::MERCHANT;
-            changeState = true;
-            break;
-
-        case 2:  // Enter Lobby
-            nextState = UIState::LOBBY;
             changeState = true;
             break;
 

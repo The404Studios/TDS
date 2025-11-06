@@ -242,8 +242,8 @@ void LoginUI::handleLoginResponse(const std::vector<uint8_t>& payload) {
         statusMessage = "Login successful!";
         std::cout << "[LoginUI] Login successful! AccountID: " << accountId << std::endl;
 
-        // Transition to lobby
-        nextState = UIState::LOBBY;
+        // Transition to main menu
+        nextState = UIState::MAIN_MENU;
         changeState = true;
     } else {
         errorMessage = std::string(resp.errorMessage);

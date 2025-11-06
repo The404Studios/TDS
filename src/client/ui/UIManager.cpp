@@ -4,15 +4,65 @@
 #include <windows.h>
 #include <gl/GL.h>
 
+// Global font display list
+static GLuint g_fontBase = 0;
+static HDC g_hDC = nullptr;
+static bool g_fontInitialized = false;
+
+// Initialize font for text rendering
+void TextRenderer::initFont(HDC hDC) {
+    g_hDC = hDC;
+
+    // Create font
+    HFONT hFont = CreateFontA(
+        -24,                    // Height
+        0,                      // Width
+        0,                      // Escapement
+        0,                      // Orientation
+        FW_BOLD,                // Weight
+        FALSE,                  // Italic
+        FALSE,                  // Underline
+        FALSE,                  // StrikeOut
+        ANSI_CHARSET,           // CharSet
+        OUT_TT_PRECIS,          // OutputPrecision
+        CLIP_DEFAULT_PRECIS,    // ClipPrecision
+        ANTIALIASED_QUALITY,    // Quality
+        FF_MODERN | FIXED_PITCH, // PitchAndFamily
+        "Courier New"           // Face name
+    );
+
+    HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
+
+    // Create display lists for font
+    g_fontBase = glGenLists(256);
+    wglUseFontBitmapsA(hDC, 0, 256, g_fontBase);
+
+    SelectObject(hDC, hOldFont);
+    DeleteObject(hFont);
+
+    g_fontInitialized = true;
+}
+
 // TextRenderer implementations
 void TextRenderer::drawText(const std::string& text, float x, float y, float size) {
+    if (!g_fontInitialized) return;
+
+    glPushAttrib(GL_LIST_BIT);
+    glListBase(g_fontBase);
+
+    // Set position and scale
     glRasterPos2f(x, y);
-    // In production, use proper font rendering (FreeType, stb_truetype, etc.)
-    // For now, this is a placeholder
+
+    // Draw the text using display lists
+    glCallLists((GLsizei)text.length(), GL_UNSIGNED_BYTE, text.c_str());
+
+    glPopAttrib();
 }
 
 void TextRenderer::drawTextCentered(const std::string& text, float y, float size) {
-    float x = 0.0f - (text.length() * 0.01f * size);
+    // Approximate character width for centering
+    float charWidth = 0.014f * size;
+    float x = 0.0f - (text.length() * charWidth / 2.0f);
     drawText(text, x, y, size);
 }
 

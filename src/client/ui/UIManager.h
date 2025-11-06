@@ -6,6 +6,7 @@
 // UI State enum
 enum class UIState {
     LOGIN,
+    MAIN_MENU,
     LOBBY,
     STASH,
     MERCHANT,
@@ -16,6 +17,7 @@ enum class UIState {
 // Simple text rendering helper
 class TextRenderer {
 public:
+    static void initFont(HDC hDC);
     static void drawText(const std::string& text, float x, float y, float size = 1.0f);
     static void drawTextCentered(const std::string& text, float y, float size = 1.0f);
 };

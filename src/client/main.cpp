@@ -149,6 +149,9 @@ bool initializeOpenGL() {
     g_hglrc = wglCreateContext(g_hdc);
     wglMakeCurrent(g_hdc, g_hglrc);
 
+    // Initialize font for text rendering
+    TextRenderer::initFont(g_hdc);
+
     // Initialize OpenGL settings
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
@@ -262,6 +265,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             UIState nextState = g_uiManager->getNextState();
 
             switch (nextState) {
+                case UIState::MAIN_MENU:
+                    if (!g_mainMenuUI) {
+                        g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
+                    }
+                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
+                    break;
+
                 case UIState::LOBBY:
                     if (!g_lobbyUI) {
                         g_lobbyUI = new LobbyUI(g_networkClient, g_loginUI->getAccountId());
@@ -270,10 +280,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     break;
 
                 case UIState::STASH:
+                    // TODO: Create StashUI class
+                    // For now, redirect to main menu
                     if (!g_mainMenuUI) {
                         g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
                     }
-                    g_uiManager->setState(UIState::STASH, g_mainMenuUI);
+                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
+                    break;
+
+                case UIState::MERCHANT:
+                    // TODO: Create MerchantUI class
+                    // For now, redirect to main menu
+                    if (!g_mainMenuUI) {
+                        g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
+                    }
+                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
                     break;
 
                 case UIState::IN_GAME:

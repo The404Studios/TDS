@@ -8,7 +8,7 @@
 class MainMenuUI : public BaseUI {
 public:
     MainMenuUI(NetworkClient* netClient, uint64_t accId)
-        : networkClient(netClient), accountId(accId), selectedOption(0) {}
+        : networkClient(netClient), accountId(accId), selectedOption(0), animTime(0.0f) {}
 
     void update(float deltaTime) override;
     void render() override;
@@ -24,6 +24,7 @@ private:
     uint64_t accountId;
     int selectedOption;
     PlayerStats playerStats;
+    float animTime;
 
     void selectOption();
     void handlePlayerDataResponse(const std::vector<uint8_t>& payload);
