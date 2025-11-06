@@ -23,6 +23,7 @@
 #include "CivilizationAI.h"
 #include "NetworkManager.h"
 #include "GameplayFeatures.h"
+#include "ExtractionShooter.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
@@ -67,6 +68,10 @@ World* g_world = nullptr;
 std::unique_ptr<ClientNetworkManager> g_networkManager = nullptr;
 std::unique_ptr<AdvancedGameManager> g_gameManager = nullptr;
 std::unique_ptr<MarketSystem> g_marketSystem = nullptr;
+
+// Extraction Shooter game mode
+ExtractionShooter* g_extractionShooter = nullptr;
+bool g_useExtractionMode = true;  // Switch between old strategy view and new extraction shooter
 
 HWND g_hWnd = nullptr;
 HDC g_hDC = nullptr;
@@ -1170,34 +1175,42 @@ void drawUI() {
 }
 
 void render() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    gluLookAt(
-        g_cameraX - sin(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
-        g_cameraY - cos(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
-        g_cameraZ + sin(g_cameraRotX * M_PI / 180) * g_cameraZ,
-        g_cameraX, g_cameraY, 0,
-        0, 0, 1
-    );
-
-    drawGround();
-
-    for (auto& building : g_world->allBuildings) {
-        drawBuilding(building.get());
+    if (g_useExtractionMode && g_extractionShooter) {
+        // Use new extraction shooter rendering
+        g_extractionShooter->render();
+        SwapBuffers(g_hDC);
     }
+    else {
+        // Old strategy view rendering
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
 
-    for (auto& agent : g_world->allAgents) {
-        if (agent->isAlive()) {
-            drawAgent(agent.get());
+        gluLookAt(
+            g_cameraX - sin(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
+            g_cameraY - cos(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
+            g_cameraZ + sin(g_cameraRotX * M_PI / 180) * g_cameraZ,
+            g_cameraX, g_cameraY, 0,
+            0, 0, 1
+        );
+
+        drawGround();
+
+        for (auto& building : g_world->allBuildings) {
+            drawBuilding(building.get());
         }
+
+        for (auto& agent : g_world->allAgents) {
+            if (agent->isAlive()) {
+                drawAgent(agent.get());
+            }
+        }
+
+        drawCombatEffects();
+        drawParticles();
+        drawUI();
+
+        SwapBuffers(g_hDC);
     }
-
-    drawCombatEffects();
-    drawParticles();
-    drawUI();
-
-    SwapBuffers(g_hDC);
 }
 
 void initOpenGL() {
@@ -1278,10 +1291,17 @@ void selectObject(int x, int y) {
 }
 
 void update() {
-    if (!g_paused && g_active) {
-        DWORD currentTime = GetTickCount();
-        float deltaTime = (currentTime - g_lastTime) / 1000.0f;
-        if (deltaTime > 0.1f) deltaTime = 0.1f;
+    DWORD currentTime = GetTickCount();
+    float deltaTime = (currentTime - g_lastTime) / 1000.0f;
+    if (deltaTime > 0.1f) deltaTime = 0.1f;
+    g_lastTime = currentTime;
+
+    if (g_useExtractionMode && g_extractionShooter) {
+        // Use new extraction shooter update
+        g_extractionShooter->update(deltaTime);
+    }
+    else if (!g_paused && g_active) {
+        // Old strategy view update
 
         // Update networking if in multiplayer mode
         if (g_multiplayerMode && g_networkManager) {
@@ -1346,53 +1366,69 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         return 0;
 
     case WM_KEYDOWN:
-        switch (wParam) {
-        case VK_SPACE:
-            g_paused = !g_paused;
-            break;
-        case VK_TAB:
-            g_menuOpen = !g_menuOpen;
-            break;
-        case '1': g_simulationSpeed = 1.0f; break;
-        case '2': g_simulationSpeed = 2.0f; break;
-        case '3': g_simulationSpeed = 3.0f; break;
-        case '4': g_simulationSpeed = 5.0f; break;
-        case '5': g_simulationSpeed = 10.0f; break;
-        case 'C':
-        case 'c':
-            if (g_selectedAgent) {
-                int newRole = ((int)g_selectedAgent->role + 1) % (int)Role::COUNT;
-                g_selectedAgent->changeRole((Role)newRole);
-                updateRoleStats();
+        // Forward to extraction shooter if active
+        if (g_useExtractionMode && g_extractionShooter) {
+            unsigned char key = (unsigned char)wParam;
+            g_extractionShooter->handleKeyPress(key, true);
+        }
+        else {
+            // Old strategy view controls
+            switch (wParam) {
+            case VK_SPACE:
+                g_paused = !g_paused;
+                break;
+            case VK_TAB:
+                g_menuOpen = !g_menuOpen;
+                break;
+            case '1': g_simulationSpeed = 1.0f; break;
+            case '2': g_simulationSpeed = 2.0f; break;
+            case '3': g_simulationSpeed = 3.0f; break;
+            case '4': g_simulationSpeed = 5.0f; break;
+            case '5': g_simulationSpeed = 10.0f; break;
+            case 'C':
+            case 'c':
+                if (g_selectedAgent) {
+                    int newRole = ((int)g_selectedAgent->role + 1) % (int)Role::COUNT;
+                    g_selectedAgent->changeRole((Role)newRole);
+                    updateRoleStats();
+                }
+                break;
+            case 'R':
+            case 'r':
+                delete g_world;
+                g_world = new World();
+                g_world->WORLD_SIZE = 500;
+                g_world->MAX_AGENTS_PER_FACTION = 100;
+                g_world->initialize();
+                g_selectedAgent = nullptr;
+                g_selectedBuilding = nullptr;
+                g_roleStats.clear();
+                break;
+            case 'N':
+            case 'n':
+                // Toggle multiplayer mode
+                g_multiplayerMode = !g_multiplayerMode;
+                if (g_multiplayerMode && !g_networkManager) {
+                    g_networkManager = std::make_unique<ClientNetworkManager>(g_serverAddress, g_serverPort);
+                    g_networkManager->initialize();
+                    std::cout << "Multiplayer mode ENABLED. Connecting to server..." << std::endl;
+                } else if (!g_multiplayerMode) {
+                    g_networkManager.reset();
+                    std::cout << "Multiplayer mode DISABLED" << std::endl;
+                }
+                break;
+            case VK_ESCAPE:
+                PostQuitMessage(0);
+                break;
             }
-            break;
-        case 'R':
-        case 'r':
-            delete g_world;
-            g_world = new World();
-            g_world->WORLD_SIZE = 500;
-            g_world->MAX_AGENTS_PER_FACTION = 100;
-            g_world->initialize();
-            g_selectedAgent = nullptr;
-            g_selectedBuilding = nullptr;
-            g_roleStats.clear();
-            break;
-        case 'N':
-        case 'n':
-            // Toggle multiplayer mode
-            g_multiplayerMode = !g_multiplayerMode;
-            if (g_multiplayerMode && !g_networkManager) {
-                g_networkManager = std::make_unique<ClientNetworkManager>(g_serverAddress, g_serverPort);
-                g_networkManager->initialize();
-                std::cout << "Multiplayer mode ENABLED. Connecting to server..." << std::endl;
-            } else if (!g_multiplayerMode) {
-                g_networkManager.reset();
-                std::cout << "Multiplayer mode DISABLED" << std::endl;
-            }
-            break;
-        case VK_ESCAPE:
-            PostQuitMessage(0);
-            break;
+        }
+        return 0;
+
+    case WM_KEYUP:
+        // Forward to extraction shooter if active
+        if (g_useExtractionMode && g_extractionShooter) {
+            unsigned char key = (unsigned char)wParam;
+            g_extractionShooter->handleKeyPress(key, false);
         }
         return 0;
 
@@ -1429,20 +1465,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     {
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
-        float dx = (float)(x - g_lastMouseX);
-        float dy = (float)(y - g_lastMouseY);
 
-        if (g_leftMouseDown && (GetKeyState(VK_CONTROL) & 0x8000)) {
-            g_cameraRotY += dx * 0.5f;
-            g_cameraRotX -= dy * 0.5f;
-            g_cameraRotX = clamp(g_cameraRotX, -89.0f, 89.0f);
+        // Forward to extraction shooter if active
+        if (g_useExtractionMode && g_extractionShooter) {
+            g_extractionShooter->handleMouseMove(x, y);
         }
-        else if (g_rightMouseDown) {
-            float panSpeed = g_cameraZ / 100.0f;
-            g_cameraX -= dx * panSpeed;
-            g_cameraY += dy * panSpeed;
-            g_cameraX = clamp(g_cameraX, 0.0f, 500.0f);
-            g_cameraY = clamp(g_cameraY, 0.0f, 500.0f);
+        else {
+            // Old strategy view mouse controls
+            float dx = (float)(x - g_lastMouseX);
+            float dy = (float)(y - g_lastMouseY);
+
+            if (g_leftMouseDown && (GetKeyState(VK_CONTROL) & 0x8000)) {
+                g_cameraRotY += dx * 0.5f;
+                g_cameraRotX -= dy * 0.5f;
+                g_cameraRotX = clamp(g_cameraRotX, -89.0f, 89.0f);
+            }
+            else if (g_rightMouseDown) {
+                float panSpeed = g_cameraZ / 100.0f;
+                g_cameraX -= dx * panSpeed;
+                g_cameraY += dy * panSpeed;
+                g_cameraX = clamp(g_cameraX, 0.0f, 500.0f);
+                g_cameraY = clamp(g_cameraY, 0.0f, 500.0f);
+            }
         }
 
         g_lastMouseX = x;
@@ -1554,6 +1598,21 @@ int main(int argc, char* argv[]) {
     std::cout << "Advanced game systems initialized!" << std::endl;
     std::cout << "Press 'N' to enable multiplayer mode." << std::endl;
 
+    // Initialize Extraction Shooter mode
+    g_extractionShooter = new ExtractionShooter();
+    std::cout << "\n========================================================" << std::endl;
+    std::cout << " EXTRACTION SHOOTER MODE" << std::endl;
+    std::cout << "========================================================" << std::endl;
+    std::cout << "CONTROLS:" << std::endl;
+    std::cout << "  WASD - Move" << std::endl;
+    std::cout << "  SPACE - Sprint" << std::endl;
+    std::cout << "  E - Pick up items" << std::endl;
+    std::cout << "  F - Extract (when in extraction zone)" << std::endl;
+    std::cout << "  ESC - Toggle inventory" << std::endl;
+    std::cout << "  1/2 - Menu options" << std::endl;
+    std::cout << "  Mouse - Look around" << std::endl;
+    std::cout << std::endl;
+
     ShowWindow(g_hWnd, SW_SHOWDEFAULT);
     UpdateWindow(g_hWnd);
 
@@ -1573,6 +1632,7 @@ int main(int argc, char* argv[]) {
     }
 
     delete g_world;
+    delete g_extractionShooter;
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(g_hRC);
     ReleaseDC(g_hWnd, g_hDC);
