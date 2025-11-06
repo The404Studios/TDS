@@ -147,6 +147,12 @@
   <!-- Source Files -->
   <ItemGroup>
     <ClCompile Include="ClientMain.cpp" />
+    <ClCompile Include="Client\NetworkClient.cpp" />
+    <ClCompile Include="Client\UIManager.cpp" />
+    <ClCompile Include="Client\LoginUI.cpp" />
+    <ClCompile Include="Client\LobbyUI.cpp" />
+    <ClCompile Include="Client\MainMenuUI.cpp" />
+    <ClCompile Include="Client\GameClient.cpp" />
   </ItemGroup>
   <!-- Header Files - Common -->
   <ItemGroup>

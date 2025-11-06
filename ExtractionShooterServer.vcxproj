@@ -143,6 +143,13 @@
   <!-- Source Files -->
   <ItemGroup>
     <ClCompile Include="Server\ServerMain.cpp" />
+    <ClCompile Include="Server\NetworkServer.cpp" />
+    <ClCompile Include="Server\AuthManager.cpp" />
+    <ClCompile Include="Server\LobbyManager.cpp" />
+    <ClCompile Include="Server\FriendManager.cpp" />
+    <ClCompile Include="Server\MatchManager.cpp" />
+    <ClCompile Include="Server\MerchantManager.cpp" />
+    <ClCompile Include="Server\PersistenceManager.cpp" />
   </ItemGroup>
   <!-- Header Files - Common (Shared) -->
   <ItemGroup>
