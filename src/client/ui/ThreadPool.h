@@ -8,6 +8,7 @@
 #include <functional>
 #include <future>
 #include <memory>
+#include <type_traits>
 
 // Thread pool for parallel task execution
 class ThreadPool {
@@ -18,7 +19,7 @@ public:
     // Submit a task and get a future for the result
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args)
-        -> std::future<typename std::result_of<F(Args...)>::type>;
+        -> std::future<typename std::invoke_result<F, Args...>::type>;
 
     // Get number of threads
     size_t getThreadCount() const { return workers.size(); }
@@ -41,9 +42,9 @@ private:
 // Template implementation must be in header
 template<class F, class... Args>
 auto ThreadPool::enqueue(F&& f, Args&&... args)
-    -> std::future<typename std::result_of<F(Args...)>::type> {
+    -> std::future<typename std::invoke_result<F, Args...>::type> {
 
-    using return_type = typename std::result_of<F(Args...)>::type;
+    using return_type = typename std::invoke_result<F, Args...>::type;
 
     auto task = std::make_shared<std::packaged_task<return_type()>>(
         std::bind(std::forward<F>(f), std::forward<Args>(args)...)

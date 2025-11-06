@@ -4,7 +4,7 @@
 #include "UIPanel.h"
 #include "UIButton.h"
 #include "UIText.h"
-#include "../NetworkClient.h"
+#include "../network/NetworkClient.h"
 #include <memory>
 
 // Login Scene - Handles login and registration
