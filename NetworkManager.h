@@ -2,9 +2,10 @@
 #define NETWORK_MANAGER_H
 
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+// IMPORTANT: Must include winsock2 BEFORE windows.h
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h>
 #include <vector>
 #include <string>
 #include <queue>

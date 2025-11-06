@@ -3,6 +3,11 @@
 
 #define NOMINMAX // Prevent Windows min/max macros
 #define _USE_MATH_DEFINES
+#define WIN32_LEAN_AND_MEAN // Prevent windows.h from including winsock.h
+
+// IMPORTANT: Must include winsock2 BEFORE windows.h to avoid conflicts
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>

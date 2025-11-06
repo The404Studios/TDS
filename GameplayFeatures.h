@@ -4,6 +4,7 @@
 #include "CivilizationAI.h"
 #include <map>
 #include <set>
+#include <functional>
 
 // Diplomacy system
 enum class DiplomaticRelation {
