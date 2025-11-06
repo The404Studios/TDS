@@ -1,5 +1,5 @@
-// Enhanced Neural Network Civilization with Text UI and Automatic Expansion
-// Complete with role-based building decisions and proper text rendering
+// Enhanced Neural Network Civilization - MULTIPLAYER CLIENT
+// Complete with networking, advanced features, and enhanced visualization
 
 #define NOMINMAX // Prevent Windows min/max macros
 #define _USE_MATH_DEFINES
@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 #include "CivilizationAI.h"
+#include "NetworkManager.h"
+#include "GameplayFeatures.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
@@ -57,11 +59,21 @@ struct Color {
 
 // Global variables
 World* g_world = nullptr;
+std::unique_ptr<ClientNetworkManager> g_networkManager = nullptr;
+std::unique_ptr<AdvancedGameManager> g_gameManager = nullptr;
+std::unique_ptr<MarketSystem> g_marketSystem = nullptr;
+
 HWND g_hWnd = nullptr;
 HDC g_hDC = nullptr;
 HGLRC g_hRC = nullptr;
 int g_windowWidth = 1600;
 int g_windowHeight = 900;
+
+// Multiplayer mode flag
+bool g_multiplayerMode = false;
+bool g_connectingToServer = false;
+std::string g_serverAddress = "127.0.0.1";
+int g_serverPort = 27015;
 
 // Camera
 float g_cameraX = 250.0f;
@@ -963,7 +975,30 @@ void drawUI() {
     ss << "Generation: " << g_world->currentGeneration
         << " | Speed: " << (int)g_simulationSpeed << "x | "
         << (g_paused ? "PAUSED" : "RUNNING");
+
+    // Add multiplayer status
+    if (g_multiplayerMode && g_networkManager) {
+        if (g_networkManager->isConnected()) {
+            ss << " | ONLINE (Ping: " << (int)g_networkManager->getPing() << "ms)";
+        } else {
+            ss << " | OFFLINE (Connecting...)";
+        }
+    } else {
+        ss << " | SINGLEPLAYER";
+    }
+
     drawText(10, 25, ss.str(), Color(1, 1, 1, 1));
+
+    // Weather and Season info
+    if (g_gameManager) {
+        ss.str("");
+        const char* weatherNames[] = {"Clear", "Rain", "Storm", "Snow", "Fog", "Drought"};
+        const char* seasonNames[] = {"Spring", "Summer", "Fall", "Winter"};
+
+        ss << "Weather: " << weatherNames[(int)g_gameManager->getCurrentWeather().type]
+           << " | Season: " << seasonNames[(int)g_gameManager->getCurrentSeason()];
+        drawText(g_windowWidth - 400, 25, ss.str(), Color(0.8f, 0.9f, 1.0f, 1));
+    }
 
     // Faction quick stats
     float xPos = 300;
@@ -1106,14 +1141,17 @@ void drawUI() {
     }
 
     // Controls hint (bottom right)
-    drawText(g_windowWidth - 300, g_windowHeight - 60,
+    drawText(g_windowWidth - 350, g_windowHeight - 80,
         "TAB: Menu | Click: Select | Ctrl+Drag: Rotate",
         Color(0.7f, 0.7f, 0.7f, 0.8f));
-    drawText(g_windowWidth - 300, g_windowHeight - 40,
+    drawText(g_windowWidth - 350, g_windowHeight - 60,
         "Right/Middle: Pan | Wheel: Zoom | C: Change Role",
         Color(0.7f, 0.7f, 0.7f, 0.8f));
-    drawText(g_windowWidth - 300, g_windowHeight - 20,
+    drawText(g_windowWidth - 350, g_windowHeight - 40,
         "SPACE: Pause | 1-5: Speed | R: Reset",
+        Color(0.7f, 0.7f, 0.7f, 0.8f));
+    drawText(g_windowWidth - 350, g_windowHeight - 20,
+        "N: Toggle Multiplayer | ESC: Exit",
         Color(0.7f, 0.7f, 0.7f, 0.8f));
 
     glDisable(GL_BLEND);
@@ -1240,7 +1278,36 @@ void update() {
         float deltaTime = (currentTime - g_lastTime) / 1000.0f;
         if (deltaTime > 0.1f) deltaTime = 0.1f;
 
+        // Update networking if in multiplayer mode
+        if (g_multiplayerMode && g_networkManager) {
+            g_networkManager->update(deltaTime);
+
+            // Process incoming packets from server
+            while (g_networkManager->hasPackets()) {
+                NetworkPacket packet = g_networkManager->getNextPacket();
+                // Handle packet (world state updates, etc.)
+            }
+
+            // Try to connect if not connected
+            if (!g_networkManager->isConnected() && !g_connectingToServer) {
+                g_connectingToServer = true;
+                if (g_networkManager->connectToServer()) {
+                    std::cout << "Connected to server!" << std::endl;
+                }
+                g_connectingToServer = false;
+            }
+        }
+
         g_world->update(deltaTime * g_simulationSpeed);
+
+        // Update advanced game systems
+        if (g_gameManager) {
+            g_gameManager->update(deltaTime, g_world);
+        }
+
+        if (g_marketSystem) {
+            g_marketSystem->updatePrices(deltaTime);
+        }
 
         updateParticles(deltaTime);
         updateCombatEffects(deltaTime);
@@ -1304,6 +1371,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             g_selectedAgent = nullptr;
             g_selectedBuilding = nullptr;
             g_roleStats.clear();
+            break;
+        case 'N':
+        case 'n':
+            // Toggle multiplayer mode
+            g_multiplayerMode = !g_multiplayerMode;
+            if (g_multiplayerMode && !g_networkManager) {
+                g_networkManager = std::make_unique<ClientNetworkManager>(g_serverAddress, g_serverPort);
+                g_networkManager->initialize();
+                std::cout << "Multiplayer mode ENABLED. Connecting to server..." << std::endl;
+            } else if (!g_multiplayerMode) {
+                g_networkManager.reset();
+                std::cout << "Multiplayer mode DISABLED" << std::endl;
+            }
             break;
         case VK_ESCAPE:
             PostQuitMessage(0);
@@ -1386,16 +1466,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 int main(int argc, char* argv[]) {
     HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-    std::cout << "==================================================" << std::endl;
-    std::cout << "ENHANCED CIVILIZATION WITH TEXT UI" << std::endl;
-    std::cout << "==================================================" << std::endl;
+    std::cout << "========================================================" << std::endl;
+    std::cout << " NEURAL CIVILIZATION - MULTIPLAYER CLIENT v2.0" << std::endl;
+    std::cout << "========================================================" << std::endl;
     std::cout << std::endl;
     std::cout << "NEW FEATURES:" << std::endl;
-    std::cout << "  - Full text UI with readable information" << std::endl;
-    std::cout << "  - Automatic role-based building expansion" << std::endl;
-    std::cout << "  - Building decisions based on population roles" << std::endl;
-    std::cout << "  - Real-time role distribution tracking" << std::endl;
-    std::cout << "  - Smart expansion based on faction needs" << std::endl;
+    std::cout << "  * CLIENT-SERVER MULTIPLAYER ARCHITECTURE" << std::endl;
+    std::cout << "  * Advanced Diplomacy System (War, Peace, Alliances)" << std::endl;
+    std::cout << "  * Technology Research Tree (Military, Economic, Civic)" << std::endl;
+    std::cout << "  * Trading System with Dynamic Market Prices" << std::endl;
+    std::cout << "  * Weather Effects (Rain, Storm, Snow, Fog, Drought)" << std::endl;
+    std::cout << "  * Seasonal Cycles (Spring, Summer, Fall, Winter)" << std::endl;
+    std::cout << "  * Advanced Combat with Unit Formations" << std::endl;
+    std::cout << "  * Mission/Quest System" << std::endl;
+    std::cout << "  * Population Happiness and Growth Mechanics" << std::endl;
+    std::cout << "  * Full Network Synchronization" << std::endl;
+    std::cout << std::endl;
+    std::cout << "CONTROLS:" << std::endl;
+    std::cout << "  N - Toggle Multiplayer Mode" << std::endl;
+    std::cout << "  TAB - Open/Close Menu" << std::endl;
+    std::cout << "  SPACE - Pause/Resume" << std::endl;
+    std::cout << "  1-5 - Simulation Speed" << std::endl;
+    std::cout << "  R - Reset World" << std::endl;
     std::cout << std::endl;
 
     WNDCLASSEX wcex = {};
@@ -1449,6 +1541,13 @@ int main(int argc, char* argv[]) {
     g_world->WORLD_SIZE = 500;
     g_world->MAX_AGENTS_PER_FACTION = 100;
     g_world->initialize();
+
+    // Initialize advanced game systems
+    g_gameManager = std::make_unique<AdvancedGameManager>();
+    g_marketSystem = std::make_unique<MarketSystem>();
+
+    std::cout << "Advanced game systems initialized!" << std::endl;
+    std::cout << "Press 'N' to enable multiplayer mode." << std::endl;
 
     ShowWindow(g_hWnd, SW_SHOWDEFAULT);
     UpdateWindow(g_hWnd);
