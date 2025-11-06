@@ -1437,8 +1437,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         g_lastMouseX = LOWORD(lParam);
         g_lastMouseY = HIWORD(lParam);
 
-        if (!(GetKeyState(VK_CONTROL) & 0x8000)) {
-            selectObject(g_lastMouseX, g_lastMouseY);
+        // Forward to extraction shooter if active
+        if (g_useExtractionMode && g_extractionShooter) {
+            g_extractionShooter->handleMouseButton(0, true);
+        }
+        else {
+            if (!(GetKeyState(VK_CONTROL) & 0x8000)) {
+                selectObject(g_lastMouseX, g_lastMouseY);
+            }
         }
 
         SetCapture(hWnd);
@@ -1453,6 +1459,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     case WM_LBUTTONUP:
         g_leftMouseDown = false;
+
+        // Forward to extraction shooter if active
+        if (g_useExtractionMode && g_extractionShooter) {
+            g_extractionShooter->handleMouseButton(0, false);
+        }
+
         if (!g_rightMouseDown) ReleaseCapture();
         return 0;
 

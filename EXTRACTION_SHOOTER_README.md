@@ -45,6 +45,28 @@ The game now features a complete extraction shooter experience where you:
 - Dynamic loot spawns (50+ items per raid)
 - AI enemy scavs (10 per raid)
 
+### ⚔️ Combat System
+- **Weapon firing** with left mouse button (click or hold for auto-fire)
+- **Raycast hit detection** - bullets travel instantly with realistic collision
+- **Ammo management** - magazine system with reserve ammo
+- **Reload system** - Press R to reload (2.5 second reload time)
+- **600 RPM fire rate** (0.1 second between shots)
+- **Bullet tracers** - visual feedback for every shot fired
+- **Muzzle flashes** - realistic weapon firing effects
+- **Damage system**:
+  - Player weapons deal 40-85 damage depending on weapon
+  - Enemies have 100 HP
+  - Enemies deal 25 damage per hit to player
+  - Player has 440 HP total
+- **AI Combat Behavior**:
+  - 50 meter detection range
+  - Auto-aggro when player is spotted or damage taken
+  - Enemies shoot back with 2-second cooldown
+  - 30% accuracy with bullet spread
+  - Enemies turn orange when passive, red when aggroed
+- **Loot on death** - killed enemies drop 2-5 random items
+- **Kill tracking** - stats tracked per raid and lifetime
+
 ### 🚁 Extraction Mechanics
 - **3 extraction zones** per raid:
   - Railroad Bridge (8 second extract)
@@ -77,8 +99,10 @@ The game now features a complete extraction shooter experience where you:
 
 ### In-Raid Controls
 - **WASD** - Move
-- **Mouse** - Look around
+- **Mouse** - Look around / Aim
+- **Left Mouse** - Shoot (hold for auto-fire)
 - **SPACE** - Sprint
+- **R** - Reload weapon
 - **E** - Pick up loot
 - **F** - Extract (when in extraction zone)
 - **ESC** - Toggle inventory
@@ -199,8 +223,11 @@ New players receive:
 ## Future Enhancements
 
 Potential additions:
-- [ ] Weapon firing and hit detection
-- [ ] AI enemy combat behavior
+- [x] Weapon firing and hit detection
+- [x] AI enemy combat behavior
+- [x] Ammo management and reload system
+- [x] Bullet tracers and muzzle flashes
+- [x] Enemy loot drops
 - [ ] Insurance system
 - [ ] Traders and market
 - [ ] Weapon modding system
