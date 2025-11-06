@@ -78,7 +78,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\server;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\server;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\server;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\server;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,31 +142,31 @@
   </ItemDefinitionGroup>
   <!-- Source Files -->
   <ItemGroup>
-    <ClCompile Include="Server\ServerMain.cpp" />
-    <ClCompile Include="Server\NetworkServer.cpp" />
-    <ClCompile Include="Server\AuthManager.cpp" />
-    <ClCompile Include="Server\LobbyManager.cpp" />
-    <ClCompile Include="Server\FriendManager.cpp" />
-    <ClCompile Include="Server\MatchManager.cpp" />
-    <ClCompile Include="Server\MerchantManager.cpp" />
-    <ClCompile Include="Server\PersistenceManager.cpp" />
+    <ClCompile Include="src\server\main.cpp" />
+    <ClCompile Include="src\server\network\NetworkServer.cpp" />
+    <ClCompile Include="src\server\managers\AuthManager.cpp" />
+    <ClCompile Include="src\server\managers\LobbyManager.cpp" />
+    <ClCompile Include="src\server\managers\FriendManager.cpp" />
+    <ClCompile Include="src\server\managers\MatchManager.cpp" />
+    <ClCompile Include="src\server\managers\MerchantManager.cpp" />
+    <ClCompile Include="src\server\managers\PersistenceManager.cpp" />
   </ItemGroup>
   <!-- Header Files - Common (Shared) -->
   <ItemGroup>
-    <ClInclude Include="Common\NetworkProtocol.h" />
-    <ClInclude Include="Common\DataStructures.h" />
-    <ClInclude Include="Common\ItemDatabase.h" />
-    <ClInclude Include="Common\Utils.h" />
+    <ClInclude Include="src\common\NetworkProtocol.h" />
+    <ClInclude Include="src\common\DataStructures.h" />
+    <ClInclude Include="src\common\ItemDatabase.h" />
+    <ClInclude Include="src\common\Utils.h" />
   </ItemGroup>
   <!-- Header Files - Server -->
   <ItemGroup>
-    <ClInclude Include="Server\NetworkServer.h" />
-    <ClInclude Include="Server\AuthManager.h" />
-    <ClInclude Include="Server\LobbyManager.h" />
-    <ClInclude Include="Server\FriendManager.h" />
-    <ClInclude Include="Server\MatchManager.h" />
-    <ClInclude Include="Server\MerchantManager.h" />
-    <ClInclude Include="Server\PersistenceManager.h" />
+    <ClInclude Include="src\server\network\NetworkServer.h" />
+    <ClInclude Include="src\server\managers\AuthManager.h" />
+    <ClInclude Include="src\server\managers\LobbyManager.h" />
+    <ClInclude Include="src\server\managers\FriendManager.h" />
+    <ClInclude Include="src\server\managers\MatchManager.h" />
+    <ClInclude Include="src\server\managers\MerchantManager.h" />
+    <ClInclude Include="src\server\managers\PersistenceManager.h" />
   </ItemGroup>
   <!-- Documentation -->
   <ItemGroup>

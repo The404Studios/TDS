@@ -1,6 +1,6 @@
 #pragma once
-#include "../Common/NetworkProtocol.h"
-#include "../Common/DataStructures.h"
+#include "../../common/NetworkProtocol.h"
+#include "../../common/DataStructures.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <vector>

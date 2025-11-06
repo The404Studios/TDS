@@ -1,7 +1,7 @@
 #pragma once
-#include "../Common/NetworkProtocol.h"
-#include "../Common/DataStructures.h"
-#include "../Common/ItemDatabase.h"
+#include "../../common/NetworkProtocol.h"
+#include "../../common/DataStructures.h"
+#include "../../common/ItemDatabase.h"
 #include <map>
 #include <fstream>
 #include <string>

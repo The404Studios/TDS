@@ -1,8 +1,8 @@
 #pragma once
 #include "UIManager.h"
-#include "NetworkClient.h"
-#include "../Common/NetworkProtocol.h"
-#include "../Common/DataStructures.h"
+#include "../network/NetworkClient.h"
+#include "../../common/NetworkProtocol.h"
+#include "../../common/DataStructures.h"
 #include <vector>
 #include <cmath>
 

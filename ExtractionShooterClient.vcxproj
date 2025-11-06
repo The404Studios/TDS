@@ -78,7 +78,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\client;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\client;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\client;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,7 +133,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Common;$(ProjectDir)Client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)src\client;$(ProjectDir)src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,29 +146,29 @@
   </ItemDefinitionGroup>
   <!-- Source Files -->
   <ItemGroup>
-    <ClCompile Include="ClientMain.cpp" />
-    <ClCompile Include="Client\NetworkClient.cpp" />
-    <ClCompile Include="Client\UIManager.cpp" />
-    <ClCompile Include="Client\LoginUI.cpp" />
-    <ClCompile Include="Client\LobbyUI.cpp" />
-    <ClCompile Include="Client\MainMenuUI.cpp" />
-    <ClCompile Include="Client\GameClient.cpp" />
+    <ClCompile Include="src\client\main.cpp" />
+    <ClCompile Include="src\client\ui\UIManager.cpp" />
+    <ClCompile Include="src\client\ui\LoginUI.cpp" />
+    <ClCompile Include="src\client\ui\LobbyUI.cpp" />
+    <ClCompile Include="src\client\ui\MainMenuUI.cpp" />
+    <ClCompile Include="src\client\ui\GameClient.cpp" />
+    <ClCompile Include="src\client\network\NetworkClient.cpp" />
   </ItemGroup>
   <!-- Header Files - Common -->
   <ItemGroup>
-    <ClInclude Include="Common\NetworkProtocol.h" />
-    <ClInclude Include="Common\DataStructures.h" />
-    <ClInclude Include="Common\ItemDatabase.h" />
-    <ClInclude Include="Common\Utils.h" />
+    <ClInclude Include="src\common\NetworkProtocol.h" />
+    <ClInclude Include="src\common\DataStructures.h" />
+    <ClInclude Include="src\common\ItemDatabase.h" />
+    <ClInclude Include="src\common\Utils.h" />
   </ItemGroup>
   <!-- Header Files - Client -->
   <ItemGroup>
-    <ClInclude Include="Client\NetworkClient.h" />
-    <ClInclude Include="Client\UIManager.h" />
-    <ClInclude Include="Client\LoginUI.h" />
-    <ClInclude Include="Client\LobbyUI.h" />
-    <ClInclude Include="Client\MainMenuUI.h" />
-    <ClInclude Include="Client\GameClient.h" />
+    <ClInclude Include="src\client\ui\UIManager.h" />
+    <ClInclude Include="src\client\ui\LoginUI.h" />
+    <ClInclude Include="src\client\ui\LobbyUI.h" />
+    <ClInclude Include="src\client\ui\MainMenuUI.h" />
+    <ClInclude Include="src\client\ui\GameClient.h" />
+    <ClInclude Include="src\client\network\NetworkClient.h" />
   </ItemGroup>
   <!-- Documentation -->
   <ItemGroup>

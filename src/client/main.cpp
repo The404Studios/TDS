@@ -10,12 +10,12 @@
 #include <iostream>
 #include <chrono>
 
-#include "Client/NetworkClient.h"
-#include "Client/UIManager.h"
-#include "Client/LoginUI.h"
-#include "Client/LobbyUI.h"
-#include "Client/MainMenuUI.h"
-#include "Client/GameClient.h"
+#include "network/NetworkClient.h"
+#include "ui/UIManager.h"
+#include "ui/LoginUI.h"
+#include "ui/LobbyUI.h"
+#include "ui/MainMenuUI.h"
+#include "ui/GameClient.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
