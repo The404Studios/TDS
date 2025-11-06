@@ -24,11 +24,30 @@ GameClient::GameClient(NetworkClient* netClient, uint64_t accId)
       terrainSize(200), terrainScale(2.0f),
       timeOfDay(12.0f), sunAngle(0.0f), rng(std::random_device{}())
 {
-    // Initialize inventory
-    inventory.push_back({ItemType::WEAPON_AK74, 1, 1});
-    inventory.push_back({ItemType::ARMOR_PACA, 1, 1});
-    inventory.push_back({ItemType::MEDICAL_IFAK, 2, 5});
-    inventory.push_back({ItemType::AMMO_545x39, 120, 200});
+    // Initialize inventory with starter gear
+    InventoryItem weapon;
+    weapon.type = ItemType::WEAPON;
+    weapon.count = 1;
+    weapon.maxStack = 1;
+    inventory.push_back(weapon);
+
+    InventoryItem armor;
+    armor.type = ItemType::ARMOR;
+    armor.count = 1;
+    armor.maxStack = 1;
+    inventory.push_back(armor);
+
+    InventoryItem medical;
+    medical.type = ItemType::MEDICAL;
+    medical.count = 2;
+    medical.maxStack = 5;
+    inventory.push_back(medical);
+
+    InventoryItem ammo;
+    ammo.type = ItemType::AMMO;
+    ammo.count = 120;
+    ammo.maxStack = 200;
+    inventory.push_back(ammo);
 
     // Generate world
     generateTerrain();
@@ -907,7 +926,11 @@ void GameClient::checkLootPickup() {
             }
 
             if (!found) {
-                inventory.push_back({loot.itemType, 1, 100});
+                InventoryItem newItem;
+                newItem.type = loot.itemType;
+                newItem.count = 1;
+                newItem.maxStack = 100;
+                inventory.push_back(newItem);
             }
 
             std::cout << "[GameClient] Picked up loot!" << std::endl;

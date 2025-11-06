@@ -64,6 +64,23 @@ public:
         return items;
     }
 
+    // Get item name by type (for displaying generic type names)
+    static const char* getItemName(ItemType type) {
+        switch (type) {
+            case ItemType::WEAPON: return "Weapon";
+            case ItemType::ARMOR: return "Armor";
+            case ItemType::HELMET: return "Helmet";
+            case ItemType::BACKPACK: return "Backpack";
+            case ItemType::AMMO: return "Ammo";
+            case ItemType::MEDICAL: return "Medical";
+            case ItemType::FOOD: return "Food";
+            case ItemType::VALUABLE: return "Valuable";
+            case ItemType::MATERIAL: return "Material";
+            case ItemType::KEY: return "Key";
+            default: return "Unknown";
+        }
+    }
+
 private:
     std::map<std::string, Item> itemTemplates;
 
