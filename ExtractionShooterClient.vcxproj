@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE}</ProjectGuid>
+    <ProjectGuid>{A3C5B8D1-4E2F-4A1B-9C3D-5E6F7A8B9C0D}</ProjectGuid>
     <RootNamespace>ExtractionShooterClient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>ExtractionShooterClient</ProjectName>
