@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+// Forward declare Windows types to avoid including windows.h in header
+typedef struct HDC__* HDC;
+
 // UI State enum
 enum class UIState {
     LOGIN,
