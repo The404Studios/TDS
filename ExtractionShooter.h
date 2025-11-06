@@ -208,6 +208,13 @@ public:
     std::string statusMessage;
     float statusMessageTimer;
 
+    // Corpse looting state
+    bool isLooting;
+    float lootingProgress;
+    float lootingTime;           // 3 seconds to loot
+    AIEnemy* targetCorpse;       // Which corpse we're looting
+    AIEnemy* nearestCorpse;      // Corpse in interact range
+
     ExtractionShooter()
         : currentState(GameState::MAIN_MENU),
           terrain(512, 512, 2.0f),
@@ -228,7 +235,12 @@ public:
           inventoryOpen(false),
           selectedItem(nullptr),
           dragStartX(0), dragStartY(0),
-          statusMessageTimer(0.0f) {
+          statusMessageTimer(0.0f),
+          isLooting(false),
+          lootingProgress(0.0f),
+          lootingTime(3.0f),
+          targetCorpse(nullptr),
+          nearestCorpse(nullptr) {
 
         memset(keys, 0, sizeof(keys));
         memset(mouseButtons, 0, sizeof(mouseButtons));
@@ -449,6 +461,27 @@ private:
             }
         }
 
+        // Update looting
+        if (isLooting) {
+            lootingProgress += deltaTime;
+
+            // Check if moved away from corpse
+            if (targetCorpse) {
+                float dx = player.position.x - targetCorpse->x;
+                float dz = player.position.z - targetCorpse->z;
+                float dist = sqrt(dx * dx + dz * dz);
+
+                if (dist > 3.0f) {  // Moved too far
+                    cancelLooting();
+                } else if (lootingProgress >= lootingTime) {
+                    finishLooting();
+                }
+            }
+
+            // Can't do other actions while looting
+            return;
+        }
+
         // Auto-fire if mouse held down
         if (mouseButtons[0] && fireRateTimer <= 0.0f && !isReloading) {
             tryShoot();
@@ -522,6 +555,22 @@ private:
                 }),
             muzzleFlashes.end()
         );
+
+        // Check for nearby corpses to loot
+        nearestCorpse = nullptr;
+        float lootRadius = 3.0f;
+        for (auto& enemy : enemies) {
+            if (!enemy.alive && !enemy.loot.empty()) {
+                float dx = player.position.x - enemy.x;
+                float dz = player.position.z - enemy.z;
+                float dist = sqrt(dx * dx + dz * dz);
+
+                if (dist < lootRadius) {
+                    nearestCorpse = &enemy;
+                    break;
+                }
+            }
+        }
 
         // Check for extraction zones
         for (auto& ext : extractions) {
@@ -1072,11 +1121,11 @@ private:
     void renderEnemies() {
         glDisable(GL_LIGHTING);
         for (auto& enemy : enemies) {
-            if (enemy.alive) {
-                glPushMatrix();
-                glTranslatef(enemy.x, enemy.y, enemy.z);
+            glPushMatrix();
+            glTranslatef(enemy.x, enemy.y, enemy.z);
 
-                // Draw as red capsule/cylinder
+            if (enemy.alive) {
+                // Draw living enemy standing
                 Color enemyColor = enemy.aggroed ? Color(1.0f, 0.0f, 0.0f) : Color(0.8f, 0.4f, 0.0f);
                 glColor3f(enemyColor.r, enemyColor.g, enemyColor.b);
 
@@ -1093,9 +1142,35 @@ private:
                 glVertex3f(0.3f, 1.8f, -0.3f);
                 glVertex3f(-0.3f, 1.8f, -0.3f);
                 glEnd();
+            } else {
+                // Draw corpse lying on ground
+                bool hasLoot = !enemy.loot.empty();
+                Color corpseColor = hasLoot ? Color(0.6f, 0.6f, 0.2f) : Color(0.4f, 0.4f, 0.4f);
+                glColor3f(corpseColor.r, corpseColor.g, corpseColor.b);
 
-                glPopMatrix();
+                // Flat rectangle on ground
+                glBegin(GL_QUADS);
+                glVertex3f(-0.4f, 0.05f, -0.8f);
+                glVertex3f(0.4f, 0.05f, -0.8f);
+                glVertex3f(0.4f, 0.05f, 0.8f);
+                glVertex3f(-0.4f, 0.05f, 0.8f);
+                glEnd();
+
+                // If has loot and nearby, highlight it
+                if (hasLoot && &enemy == nearestCorpse) {
+                    glColor3f(1.0f, 1.0f, 0.0f);  // Yellow highlight
+                    glLineWidth(3.0f);
+                    glBegin(GL_LINE_LOOP);
+                    glVertex3f(-0.5f, 0.1f, -0.9f);
+                    glVertex3f(0.5f, 0.1f, -0.9f);
+                    glVertex3f(0.5f, 0.1f, 0.9f);
+                    glVertex3f(-0.5f, 0.1f, 0.9f);
+                    glEnd();
+                    glLineWidth(1.0f);
+                }
             }
+
+            glPopMatrix();
         }
         glEnable(GL_LIGHTING);
     }
@@ -1218,6 +1293,74 @@ private:
             glEnd();
         }
 
+        // Looting UI
+        if (isLooting && targetCorpse) {
+            // Looting progress bar background
+            glColor3f(0.2f, 0.2f, 0.2f);
+            glBegin(GL_QUADS);
+            glVertex2f(250, 250);
+            glVertex2f(550, 250);
+            glVertex2f(550, 350);
+            glVertex2f(250, 350);
+            glEnd();
+
+            // Looting progress bar
+            glColor3f(1.0f, 0.8f, 0.2f);
+            float progress = lootingProgress / lootingTime;
+            glBegin(GL_QUADS);
+            glVertex2f(260, 260);
+            glVertex2f(260 + progress * 280, 260);
+            glVertex2f(260 + progress * 280, 280);
+            glVertex2f(260, 280);
+            glEnd();
+
+            // Item list background
+            glColor3f(0.1f, 0.1f, 0.1f);
+            glBegin(GL_QUADS);
+            glVertex2f(260, 290);
+            glVertex2f(540, 290);
+            glVertex2f(540, 340);
+            glVertex2f(260, 340);
+            glEnd();
+
+            // Draw item slots (simplified - just show count)
+            int itemCount = targetCorpse->loot.size();
+            for (int i = 0; i < std::min(5, itemCount); i++) {
+                Color rarity = getRarityColor(targetCorpse->loot[i]->rarity);
+                glColor3f(rarity.r, rarity.g, rarity.b);
+                glBegin(GL_QUADS);
+                glVertex2f(270 + i * 50, 295);
+                glVertex2f(315 + i * 50, 295);
+                glVertex2f(315 + i * 50, 335);
+                glVertex2f(270 + i * 50, 335);
+                glEnd();
+            }
+        }
+
+        // Corpse interaction prompt
+        if (nearestCorpse && !isLooting) {
+            int itemCount = nearestCorpse->loot.size();
+            if (itemCount > 0) {
+                // Prompt background
+                glColor4f(0.0f, 0.0f, 0.0f, 0.7f);
+                glBegin(GL_QUADS);
+                glVertex2f(300, 350);
+                glVertex2f(500, 350);
+                glVertex2f(500, 380);
+                glVertex2f(300, 380);
+                glEnd();
+
+                // "Press E to loot" indicator
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glBegin(GL_QUADS);
+                glVertex2f(350, 355);
+                glVertex2f(450, 355);
+                glVertex2f(450, 375);
+                glVertex2f(350, 375);
+                glEnd();
+            }
+        }
+
         // Status message
         if (statusMessageTimer > 0.0f) {
             glColor4f(1.0f, 1.0f, 1.0f, std::min(1.0f, statusMessageTimer));
@@ -1329,6 +1472,13 @@ private:
     }
 
     void tryPickupLoot() {
+        // First check for corpse looting
+        if (nearestCorpse) {
+            startLooting(nearestCorpse);
+            return;
+        }
+
+        // Then check for loose loot
         float pickupRadius = 3.0f;
 
         for (auto& loot : lootSpawns) {
@@ -1346,6 +1496,42 @@ private:
                 }
             }
         }
+    }
+
+    void startLooting(AIEnemy* corpse) {
+        if (!corpse || corpse->alive) return;
+
+        isLooting = true;
+        lootingProgress = 0.0f;
+        targetCorpse = corpse;
+        showStatusMessage("Looting body...");
+    }
+
+    void finishLooting() {
+        if (!targetCorpse) return;
+
+        // Transfer all loot from corpse to player
+        int itemCount = targetCorpse->loot.size();
+        for (auto& item : targetCorpse->loot) {
+            collectedLoot.push_back(item);
+        }
+
+        showStatusMessage("Looted " + std::to_string(itemCount) + " items from body");
+
+        // Clear corpse loot
+        targetCorpse->loot.clear();
+
+        // Reset looting state
+        isLooting = false;
+        lootingProgress = 0.0f;
+        targetCorpse = nullptr;
+    }
+
+    void cancelLooting() {
+        isLooting = false;
+        lootingProgress = 0.0f;
+        targetCorpse = nullptr;
+        showStatusMessage("Looting cancelled");
     }
 
     void tryExtract() {

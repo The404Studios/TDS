@@ -63,15 +63,8 @@ struct Color {
     }
 };
 
-// Global variables
-World* g_world = nullptr;
-std::unique_ptr<ClientNetworkManager> g_networkManager = nullptr;
-std::unique_ptr<AdvancedGameManager> g_gameManager = nullptr;
-std::unique_ptr<MarketSystem> g_marketSystem = nullptr;
-
-// Extraction Shooter game mode
+// Global variables - Extraction Shooter only
 ExtractionShooter* g_extractionShooter = nullptr;
-bool g_useExtractionMode = true;  // Switch between old strategy view and new extraction shooter
 
 HWND g_hWnd = nullptr;
 HDC g_hDC = nullptr;
@@ -79,37 +72,14 @@ HGLRC g_hRC = nullptr;
 int g_windowWidth = 1600;
 int g_windowHeight = 900;
 
-// Multiplayer mode flag
-bool g_multiplayerMode = false;
-bool g_connectingToServer = false;
-std::string g_serverAddress = "127.0.0.1";
-int g_serverPort = 27015;
-
-// Camera
-float g_cameraX = 250.0f;
-float g_cameraY = 250.0f;
-float g_cameraZ = 150.0f;
-float g_cameraRotX = -60.0f;
-float g_cameraRotY = 0.0f;
-
 // Mouse
 int g_lastMouseX = 0;
 int g_lastMouseY = 0;
 bool g_leftMouseDown = false;
 bool g_rightMouseDown = false;
-bool g_middleMouseDown = false;
 
-// Simulation
-bool g_paused = false;
-float g_simulationSpeed = 1.0f;
+// Timing
 DWORD g_lastTime = 0;
-bool g_active = true;
-
-// UI
-bool g_showDetailedUI = true;
-bool g_menuOpen = false;
-float g_menuAnimation = 0.0f;
-float g_uiAnimationTime = 0.0f;
 
 // Selection
 Agent* g_selectedAgent = nullptr;
@@ -1175,40 +1145,8 @@ void drawUI() {
 }
 
 void render() {
-    if (g_useExtractionMode && g_extractionShooter) {
-        // Use new extraction shooter rendering
+    if (g_extractionShooter) {
         g_extractionShooter->render();
-        SwapBuffers(g_hDC);
-    }
-    else {
-        // Old strategy view rendering
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
-
-        gluLookAt(
-            g_cameraX - sin(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
-            g_cameraY - cos(g_cameraRotY * M_PI / 180) * cos(g_cameraRotX * M_PI / 180) * g_cameraZ,
-            g_cameraZ + sin(g_cameraRotX * M_PI / 180) * g_cameraZ,
-            g_cameraX, g_cameraY, 0,
-            0, 0, 1
-        );
-
-        drawGround();
-
-        for (auto& building : g_world->allBuildings) {
-            drawBuilding(building.get());
-        }
-
-        for (auto& agent : g_world->allAgents) {
-            if (agent->isAlive()) {
-                drawAgent(agent.get());
-            }
-        }
-
-        drawCombatEffects();
-        drawParticles();
-        drawUI();
-
         SwapBuffers(g_hDC);
     }
 }
@@ -1296,66 +1234,8 @@ void update() {
     if (deltaTime > 0.1f) deltaTime = 0.1f;
     g_lastTime = currentTime;
 
-    if (g_useExtractionMode && g_extractionShooter) {
-        // Use new extraction shooter update
+    if (g_extractionShooter) {
         g_extractionShooter->update(deltaTime);
-    }
-    else if (!g_paused && g_active) {
-        // Old strategy view update
-
-        // Update networking if in multiplayer mode
-        if (g_multiplayerMode && g_networkManager) {
-            g_networkManager->update(deltaTime);
-
-            // Process incoming packets from server
-            while (g_networkManager->hasPackets()) {
-                NetworkPacket packet = g_networkManager->getNextPacket();
-                // Handle packet (world state updates, etc.)
-            }
-
-            // Try to connect if not connected
-            if (!g_networkManager->isConnected() && !g_connectingToServer) {
-                g_connectingToServer = true;
-                if (g_networkManager->connectToServer()) {
-                    std::cout << "Connected to server!" << std::endl;
-                }
-                g_connectingToServer = false;
-            }
-        }
-
-        g_world->update(deltaTime * g_simulationSpeed);
-
-        // Update advanced game systems
-        if (g_gameManager) {
-            g_gameManager->update(deltaTime, g_world);
-        }
-
-        if (g_marketSystem) {
-            g_marketSystem->updatePrices(deltaTime);
-        }
-
-        updateParticles(deltaTime);
-        updateCombatEffects(deltaTime);
-        processAutomaticExpansion(deltaTime);
-
-        // Combat visualization
-        for (auto& agent : g_world->allAgents) {
-            if (agent->role == Role::SOLDIER && agent->targetEnemy && agent->isAlive()) {
-                float dist = (agent->position - agent->targetEnemy->position).length();
-                if (dist < 15.0f && rand() % 60 == 0) {
-                    addCombatEffect(
-                        agent->position + Vector3(0, 0, 1),
-                        agent->targetEnemy->position + Vector3(0, 0, 1),
-                        getFactionColor(agent->faction)
-                    );
-                }
-            }
-        }
-
-        g_lastTime = currentTime;
-    }
-    else {
-        g_lastTime = GetTickCount();
     }
 }
 
@@ -1366,67 +1246,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         return 0;
 
     case WM_KEYDOWN:
-        // Forward to extraction shooter if active
-        if (g_useExtractionMode && g_extractionShooter) {
+        if (g_extractionShooter) {
             unsigned char key = (unsigned char)wParam;
             g_extractionShooter->handleKeyPress(key, true);
-        }
-        else {
-            // Old strategy view controls
-            switch (wParam) {
-            case VK_SPACE:
-                g_paused = !g_paused;
-                break;
-            case VK_TAB:
-                g_menuOpen = !g_menuOpen;
-                break;
-            case '1': g_simulationSpeed = 1.0f; break;
-            case '2': g_simulationSpeed = 2.0f; break;
-            case '3': g_simulationSpeed = 3.0f; break;
-            case '4': g_simulationSpeed = 5.0f; break;
-            case '5': g_simulationSpeed = 10.0f; break;
-            case 'C':
-            case 'c':
-                if (g_selectedAgent) {
-                    int newRole = ((int)g_selectedAgent->role + 1) % (int)Role::COUNT;
-                    g_selectedAgent->changeRole((Role)newRole);
-                    updateRoleStats();
-                }
-                break;
-            case 'R':
-            case 'r':
-                delete g_world;
-                g_world = new World();
-                g_world->WORLD_SIZE = 500;
-                g_world->MAX_AGENTS_PER_FACTION = 100;
-                g_world->initialize();
-                g_selectedAgent = nullptr;
-                g_selectedBuilding = nullptr;
-                g_roleStats.clear();
-                break;
-            case 'N':
-            case 'n':
-                // Toggle multiplayer mode
-                g_multiplayerMode = !g_multiplayerMode;
-                if (g_multiplayerMode && !g_networkManager) {
-                    g_networkManager = std::make_unique<ClientNetworkManager>(g_serverAddress, g_serverPort);
-                    g_networkManager->initialize();
-                    std::cout << "Multiplayer mode ENABLED. Connecting to server..." << std::endl;
-                } else if (!g_multiplayerMode) {
-                    g_networkManager.reset();
-                    std::cout << "Multiplayer mode DISABLED" << std::endl;
-                }
-                break;
-            case VK_ESCAPE:
-                PostQuitMessage(0);
-                break;
-            }
         }
         return 0;
 
     case WM_KEYUP:
-        // Forward to extraction shooter if active
-        if (g_useExtractionMode && g_extractionShooter) {
+        if (g_extractionShooter) {
             unsigned char key = (unsigned char)wParam;
             g_extractionShooter->handleKeyPress(key, false);
         }
@@ -1437,14 +1264,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         g_lastMouseX = LOWORD(lParam);
         g_lastMouseY = HIWORD(lParam);
 
-        // Forward to extraction shooter if active
-        if (g_useExtractionMode && g_extractionShooter) {
+        if (g_extractionShooter) {
             g_extractionShooter->handleMouseButton(0, true);
-        }
-        else {
-            if (!(GetKeyState(VK_CONTROL) & 0x8000)) {
-                selectObject(g_lastMouseX, g_lastMouseY);
-            }
         }
 
         SetCapture(hWnd);
@@ -1460,8 +1281,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_LBUTTONUP:
         g_leftMouseDown = false;
 
-        // Forward to extraction shooter if active
-        if (g_useExtractionMode && g_extractionShooter) {
+        if (g_extractionShooter) {
             g_extractionShooter->handleMouseButton(0, false);
         }
 
@@ -1478,27 +1298,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
 
-        // Forward to extraction shooter if active
-        if (g_useExtractionMode && g_extractionShooter) {
+        if (g_extractionShooter) {
             g_extractionShooter->handleMouseMove(x, y);
-        }
-        else {
-            // Old strategy view mouse controls
-            float dx = (float)(x - g_lastMouseX);
-            float dy = (float)(y - g_lastMouseY);
-
-            if (g_leftMouseDown && (GetKeyState(VK_CONTROL) & 0x8000)) {
-                g_cameraRotY += dx * 0.5f;
-                g_cameraRotX -= dy * 0.5f;
-                g_cameraRotX = clamp(g_cameraRotX, -89.0f, 89.0f);
-            }
-            else if (g_rightMouseDown) {
-                float panSpeed = g_cameraZ / 100.0f;
-                g_cameraX -= dx * panSpeed;
-                g_cameraY += dy * panSpeed;
-                g_cameraX = clamp(g_cameraX, 0.0f, 500.0f);
-                g_cameraY = clamp(g_cameraY, 0.0f, 500.0f);
-            }
         }
 
         g_lastMouseX = x;
@@ -1528,27 +1329,8 @@ int main(int argc, char* argv[]) {
     HINSTANCE hInstance = GetModuleHandle(nullptr);
 
     std::cout << "========================================================" << std::endl;
-    std::cout << " NEURAL CIVILIZATION - MULTIPLAYER CLIENT v2.0" << std::endl;
+    std::cout << " TARKOV-STYLE EXTRACTION SHOOTER" << std::endl;
     std::cout << "========================================================" << std::endl;
-    std::cout << std::endl;
-    std::cout << "NEW FEATURES:" << std::endl;
-    std::cout << "  * CLIENT-SERVER MULTIPLAYER ARCHITECTURE" << std::endl;
-    std::cout << "  * Advanced Diplomacy System (War, Peace, Alliances)" << std::endl;
-    std::cout << "  * Technology Research Tree (Military, Economic, Civic)" << std::endl;
-    std::cout << "  * Trading System with Dynamic Market Prices" << std::endl;
-    std::cout << "  * Weather Effects (Rain, Storm, Snow, Fog, Drought)" << std::endl;
-    std::cout << "  * Seasonal Cycles (Spring, Summer, Fall, Winter)" << std::endl;
-    std::cout << "  * Advanced Combat with Unit Formations" << std::endl;
-    std::cout << "  * Mission/Quest System" << std::endl;
-    std::cout << "  * Population Happiness and Growth Mechanics" << std::endl;
-    std::cout << "  * Full Network Synchronization" << std::endl;
-    std::cout << std::endl;
-    std::cout << "CONTROLS:" << std::endl;
-    std::cout << "  N - Toggle Multiplayer Mode" << std::endl;
-    std::cout << "  TAB - Open/Close Menu" << std::endl;
-    std::cout << "  SPACE - Pause/Resume" << std::endl;
-    std::cout << "  1-5 - Simulation Speed" << std::endl;
-    std::cout << "  R - Reset World" << std::endl;
     std::cout << std::endl;
 
     WNDCLASSEX wcex = {};
@@ -1569,7 +1351,7 @@ int main(int argc, char* argv[]) {
     g_hWnd = CreateWindowEx(
         0,
         L"EnhancedCivilization",
-        L"Neural Network Civilization - Enhanced Edition",
+        L"Extraction Shooter - Tarkov Style",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right - rect.left, rect.bottom - rect.top,
@@ -1595,34 +1377,21 @@ int main(int argc, char* argv[]) {
     wglMakeCurrent(g_hDC, g_hRC);
 
     initOpenGL();
-    initFont();
     resize(g_windowWidth, g_windowHeight);
 
-    g_world = new World();
-    g_world->WORLD_SIZE = 500;
-    g_world->MAX_AGENTS_PER_FACTION = 100;
-    g_world->initialize();
-
-    // Initialize advanced game systems
-    g_gameManager = std::make_unique<AdvancedGameManager>();
-    g_marketSystem = std::make_unique<MarketSystem>();
-
-    std::cout << "Advanced game systems initialized!" << std::endl;
-    std::cout << "Press 'N' to enable multiplayer mode." << std::endl;
-
-    // Initialize Extraction Shooter mode
+    // Initialize Extraction Shooter
     g_extractionShooter = new ExtractionShooter();
-    std::cout << "\n========================================================" << std::endl;
-    std::cout << " EXTRACTION SHOOTER MODE" << std::endl;
-    std::cout << "========================================================" << std::endl;
+
     std::cout << "CONTROLS:" << std::endl;
     std::cout << "  WASD - Move" << std::endl;
+    std::cout << "  Mouse - Look / Aim" << std::endl;
+    std::cout << "  Left Click - Shoot" << std::endl;
     std::cout << "  SPACE - Sprint" << std::endl;
-    std::cout << "  E - Pick up items" << std::endl;
-    std::cout << "  F - Extract (when in extraction zone)" << std::endl;
+    std::cout << "  R - Reload" << std::endl;
+    std::cout << "  E - Pick up / Loot corpses" << std::endl;
+    std::cout << "  F - Extract (when in green zone)" << std::endl;
     std::cout << "  ESC - Toggle inventory" << std::endl;
     std::cout << "  1/2 - Menu options" << std::endl;
-    std::cout << "  Mouse - Look around" << std::endl;
     std::cout << std::endl;
 
     ShowWindow(g_hWnd, SW_SHOWDEFAULT);
@@ -1643,7 +1412,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    delete g_world;
     delete g_extractionShooter;
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(g_hRC);
