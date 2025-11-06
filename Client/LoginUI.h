@@ -2,6 +2,7 @@
 #include "UIManager.h"
 #include "NetworkClient.h"
 #include "../Common/NetworkProtocol.h"
+#include "../Common/Utils.h"
 #include <string>
 #include <cstring>
 

@@ -153,6 +153,7 @@
     <ClInclude Include="Common\NetworkProtocol.h" />
     <ClInclude Include="Common\DataStructures.h" />
     <ClInclude Include="Common\ItemDatabase.h" />
+    <ClInclude Include="Common\Utils.h" />
   </ItemGroup>
   <!-- Header Files - Client -->
   <ItemGroup>

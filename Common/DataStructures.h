@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <cmath>
 
 // Core data structures shared between client and server
 

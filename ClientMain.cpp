@@ -59,10 +59,10 @@ bool initializeOpenGL() {
     // Create window
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0, 0,
                       GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-                      "ExtractionShooter", NULL };
+                      L"ExtractionShooter", NULL };
     RegisterClassEx(&wc);
 
-    g_hwnd = CreateWindow("ExtractionShooter", "Extraction Shooter - Multiplayer",
+    g_hwnd = CreateWindow(L"ExtractionShooter", L"Extraction Shooter - Multiplayer",
                           WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720,
                           NULL, NULL, wc.hInstance, NULL);
 

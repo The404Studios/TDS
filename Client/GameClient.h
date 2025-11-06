@@ -6,6 +6,13 @@
 #include <vector>
 #include <cmath>
 
+// Manual gluPerspective implementation (GLU might not be available)
+inline void myPerspective(double fovy, double aspect, double zNear, double zFar) {
+    double fH = std::tan(fovy / 360.0 * 3.14159265) * zNear;
+    double fW = fH * aspect;
+    glFrustum(-fW, fW, -fH, fH, zNear, zFar);
+}
+
 // In-game client (FPS gameplay)
 class GameClient : public BaseUI {
 public:
@@ -67,7 +74,7 @@ public:
         // Render simple 3D view
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(90.0, 1.0, 0.1, 1000.0);
+        myPerspective(90.0, 1.0, 0.1, 1000.0);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
