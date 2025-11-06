@@ -1,5 +1,5 @@
-// Extraction Shooter - Client Entry Point
-// Multiplayer Tarkov-style extraction shooter with lobby system
+// Extraction Shooter - Client Entry Point with Scene Management
+// Completely redesigned with hierarchical scene system, threading, and scheduling
 
 // IMPORTANT: Include winsock2 BEFORE windows.h to avoid conflicts
 #include <winsock2.h>
@@ -9,13 +9,13 @@
 #include <gl/GLU.h>
 #include <iostream>
 #include <chrono>
+#include <memory>
 
 #include "network/NetworkClient.h"
-#include "ui/UIManager.h"
-#include "ui/LoginUI.h"
-#include "ui/LobbyUI.h"
-#include "ui/MainMenuUI.h"
-#include "ui/GameClient.h"
+#include "ui/SceneManager.h"
+#include "ui/LoginScene.h"
+#include "ui/MainMenuScene.h"
+#include "ui/UIText.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
@@ -35,14 +35,18 @@ float g_aspectRatio = 16.0f / 9.0f;
 float g_mouseX = 0.0f;
 float g_mouseY = 0.0f;
 
-NetworkClient* g_networkClient = nullptr;
-UIManager* g_uiManager = nullptr;
+// Core systems
+std::unique_ptr<NetworkClient> g_networkClient;
+std::unique_ptr<SceneManager> g_sceneManager;
 
-// Current UI screens
-LoginUI* g_loginUI = nullptr;
-LobbyUI* g_lobbyUI = nullptr;
-MainMenuUI* g_mainMenuUI = nullptr;
-GameClient* g_gameClient = nullptr;
+// Scene references
+std::shared_ptr<LoginScene> g_loginScene;
+std::shared_ptr<MainMenuScene> g_mainMenuScene;
+
+// Forward declarations
+void handleSceneInput(char key);
+void handleSceneMouseClick(float x, float y);
+void handleSceneMouseMove(float x, float y);
 
 // Window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -53,10 +57,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return 0;
 
         case WM_CHAR:
-            // Forward input to UI
-            if (g_uiManager) {
-                g_uiManager->handleInput((char)wParam);
-            }
+            handleSceneInput((char)wParam);
             return 0;
 
         case WM_SIZE:
@@ -65,53 +66,87 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_windowHeight = HIWORD(lParam);
             if (g_windowHeight > 0) {
                 g_aspectRatio = (float)g_windowWidth / (float)g_windowHeight;
-                if (g_uiManager) {
-                    g_uiManager->setAspectRatio(g_aspectRatio);
-                }
             }
             glViewport(0, 0, g_windowWidth, g_windowHeight);
+
+            // Update projection matrix
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            float halfAspect = g_aspectRatio / 2.0f;
+            glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
+            glMatrixMode(GL_MODELVIEW);
             return 0;
 
         case WM_MOUSEMOVE:
             {
-                // Get mouse position in screen coordinates
                 int screenX = LOWORD(lParam);
                 int screenY = HIWORD(lParam);
 
-                // Convert to OpenGL coordinates (centered coordinate system)
-                // X: -aspectRatio/2 to aspectRatio/2
-                // Y: -1 to 1 (flipped)
+                // Convert to OpenGL coordinates
                 float halfAspect = g_aspectRatio / 2.0f;
                 g_mouseX = (screenX / (float)g_windowWidth) * g_aspectRatio - halfAspect;
                 g_mouseY = 1.0f - (screenY / (float)g_windowHeight) * 2.0f;
 
-                // Forward mouse position to UI manager
-                if (g_uiManager) {
-                    g_uiManager->setMousePosition(g_mouseX, g_mouseY);
-                }
+                handleSceneMouseMove(g_mouseX, g_mouseY);
             }
             return 0;
 
         case WM_LBUTTONDOWN:
             {
-                // Get mouse position in screen coordinates
                 int screenX = LOWORD(lParam);
                 int screenY = HIWORD(lParam);
 
-                // Convert to OpenGL coordinates (centered coordinate system)
                 float halfAspect = g_aspectRatio / 2.0f;
                 float glX = (screenX / (float)g_windowWidth) * g_aspectRatio - halfAspect;
                 float glY = 1.0f - (screenY / (float)g_windowHeight) * 2.0f;
 
-                // Forward click to UI manager
-                if (g_uiManager) {
-                    g_uiManager->handleMouseClick(glX, glY);
-                }
+                handleSceneMouseClick(glX, glY);
             }
             return 0;
     }
 
     return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+// Scene input handlers
+void handleSceneInput(char key) {
+    if (!g_sceneManager) return;
+
+    auto currentScene = g_sceneManager->getCurrentScene();
+    if (!currentScene) return;
+
+    // Route input to appropriate scene
+    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+        loginScene->handleInput(key);
+    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+        mainMenuScene->handleInput(key);
+    }
+}
+
+void handleSceneMouseClick(float x, float y) {
+    if (!g_sceneManager) return;
+
+    auto currentScene = g_sceneManager->getCurrentScene();
+    if (!currentScene) return;
+
+    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+        loginScene->handleMouseClick(x, y);
+    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+        mainMenuScene->handleMouseClick(x, y);
+    }
+}
+
+void handleSceneMouseMove(float x, float y) {
+    if (!g_sceneManager) return;
+
+    auto currentScene = g_sceneManager->getCurrentScene();
+    if (!currentScene) return;
+
+    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+        loginScene->handleMouseMove(x, y);
+    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+        mainMenuScene->handleMouseMove(x, y);
+    }
 }
 
 // Initialize OpenGL
@@ -122,7 +157,7 @@ bool initializeOpenGL() {
                       L"ExtractionShooter", NULL };
     RegisterClassEx(&wc);
 
-    g_hwnd = CreateWindow(L"ExtractionShooter", L"Extraction Shooter - Multiplayer",
+    g_hwnd = CreateWindow(L"ExtractionShooter", L"Extraction Shooter - Scene-Based Architecture",
                           WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720,
                           NULL, NULL, wc.hInstance, NULL);
 
@@ -150,17 +185,15 @@ bool initializeOpenGL() {
     wglMakeCurrent(g_hdc, g_hglrc);
 
     // Initialize font for text rendering
-    TextRenderer::initFont(g_hdc);
+    UIText::initFont(g_hdc);
 
     // Initialize OpenGL settings
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 
-    // Set up 2D orthographic projection for UI
+    // Set up 2D orthographic projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Use aspect ratio-aware orthographic projection centered at origin
-    // X: -aspectRatio/2 to aspectRatio/2, Y: -1 to 1
     float halfAspect = g_aspectRatio / 2.0f;
     glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
@@ -169,19 +202,97 @@ bool initializeOpenGL() {
     ShowWindow(g_hwnd, SW_SHOW);
     UpdateWindow(g_hwnd);
 
-    std::cout << "[Client] OpenGL initialized" << std::endl;
+    std::cout << "[Client] OpenGL initialized with scene system" << std::endl;
 
     return true;
 }
 
+// Initialize scenes
+void initializeScenes() {
+    std::cout << "[Client] Initializing scene system..." << std::endl;
+
+    // Create scene manager
+    g_sceneManager = std::make_unique<SceneManager>();
+
+    // Create login scene
+    g_loginScene = std::make_shared<LoginScene>(g_networkClient.get());
+    g_sceneManager->registerScene("Login", g_loginScene);
+
+    // Create main menu scene
+    g_mainMenuScene = std::make_shared<MainMenuScene>(g_networkClient.get(), 0);
+    g_sceneManager->registerScene("MainMenu", g_mainMenuScene);
+
+    // Setup navigation callbacks for main menu
+    g_mainMenuScene->setOnEnterLobby([]() {
+        std::cout << "[Client] Navigate to: Lobby" << std::endl;
+        // TODO: Implement lobby scene
+    });
+
+    g_mainMenuScene->setOnViewStash([]() {
+        std::cout << "[Client] Navigate to: Stash" << std::endl;
+        // TODO: Implement stash scene
+    });
+
+    g_mainMenuScene->setOnOpenMerchants([]() {
+        std::cout << "[Client] Navigate to: Merchants" << std::endl;
+        // TODO: Implement merchant scene
+    });
+
+    g_mainMenuScene->setOnLogout([]() {
+        std::cout << "[Client] Logging out..." << std::endl;
+        g_sceneManager->transitionTo("Login", true);
+    });
+
+    // Load login scene initially
+    g_sceneManager->loadScene("Login");
+
+    // Schedule a task to check for successful login
+    g_sceneManager->getScheduler().scheduleRepeating([]() {
+        if (g_loginScene && g_loginScene->getAccountId() != 0) {
+            std::cout << "[Client] Login successful! Transitioning to main menu..." << std::endl;
+
+            // Update main menu with account ID
+            uint64_t accountId = g_loginScene->getAccountId();
+            g_mainMenuScene = std::make_shared<MainMenuScene>(g_networkClient.get(), accountId);
+            g_sceneManager->registerScene("MainMenu", g_mainMenuScene);
+
+            // Setup callbacks again
+            g_mainMenuScene->setOnEnterLobby([]() {
+                std::cout << "[Client] Navigate to: Lobby" << std::endl;
+            });
+            g_mainMenuScene->setOnViewStash([]() {
+                std::cout << "[Client] Navigate to: Stash" << std::endl;
+            });
+            g_mainMenuScene->setOnOpenMerchants([]() {
+                std::cout << "[Client] Navigate to: Merchants" << std::endl;
+            });
+            g_mainMenuScene->setOnLogout([]() {
+                std::cout << "[Client] Logging out..." << std::endl;
+                g_sceneManager->transitionTo("Login", true);
+            });
+
+            // Transition to main menu asynchronously
+            g_sceneManager->transitionToAsync("MainMenu", true);
+        }
+    }, 0.1f); // Check every 100ms
+
+    std::cout << "[Client] Scene system initialized!" << std::endl;
+    std::cout << "[Client] Registered scenes: Login, MainMenu" << std::endl;
+    std::cout << "[Client] Current scene: Login" << std::endl;
+}
+
 // Cleanup
 void cleanup() {
-    if (g_gameClient) delete g_gameClient;
-    if (g_mainMenuUI) delete g_mainMenuUI;
-    if (g_lobbyUI) delete g_lobbyUI;
-    if (g_loginUI) delete g_loginUI;
-    if (g_uiManager) delete g_uiManager;
-    if (g_networkClient) delete g_networkClient;
+    std::cout << "[Client] Unloading all scenes..." << std::endl;
+
+    if (g_sceneManager) {
+        g_sceneManager->unloadAllScenes();
+        g_sceneManager.reset();
+    }
+
+    g_mainMenuScene.reset();
+    g_loginScene.reset();
+    g_networkClient.reset();
 
     if (g_hglrc) {
         wglMakeCurrent(NULL, NULL);
@@ -200,7 +311,8 @@ void cleanup() {
 // Main entry point
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     std::cout << "========================================" << std::endl;
-    std::cout << "  EXTRACTION SHOOTER - Multiplayer Game" << std::endl;
+    std::cout << "  EXTRACTION SHOOTER - Scene System" << std::endl;
+    std::cout << "  with Threading & Hierarchy" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << std::endl;
 
@@ -211,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     // Create network client
-    g_networkClient = new NetworkClient();
+    g_networkClient = std::make_unique<NetworkClient>();
 
     // Connect to server
     std::cout << "[Client] Connecting to server..." << std::endl;
@@ -224,15 +336,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     std::cout << "[Client] Connected to server successfully!" << std::endl;
 
-    // Create UI manager
-    g_uiManager = new UIManager();
-    g_uiManager->setAspectRatio(g_aspectRatio);
-
-    // Create login UI (starting state)
-    g_loginUI = new LoginUI(g_networkClient);
-    g_uiManager->setState(UIState::LOGIN, g_loginUI);
+    // Initialize scene system
+    initializeScenes();
 
     std::cout << "[Client] Client initialized successfully!" << std::endl;
+    std::cout << "[Client] ThreadPool running with "
+              << g_sceneManager->getThreadPool().getThreadCount() << " threads" << std::endl;
     std::cout << std::endl;
 
     // Main game loop
@@ -257,79 +366,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // Update network
         g_networkClient->update();
 
-        // Update UI
-        g_uiManager->update(deltaTime);
+        // Update scene manager (handles scheduler and current scene)
+        g_sceneManager->update(deltaTime);
 
-        // Handle state transitions
-        if (g_uiManager->shouldChangeState()) {
-            UIState nextState = g_uiManager->getNextState();
-
-            switch (nextState) {
-                case UIState::MAIN_MENU:
-                    if (!g_mainMenuUI) {
-                        g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
-                    }
-                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
-                    break;
-
-                case UIState::LOBBY:
-                    if (!g_lobbyUI) {
-                        g_lobbyUI = new LobbyUI(g_networkClient, g_loginUI->getAccountId());
-                    }
-                    g_uiManager->setState(UIState::LOBBY, g_lobbyUI);
-                    break;
-
-                case UIState::STASH:
-                    // TODO: Create StashUI class
-                    // For now, redirect to main menu
-                    if (!g_mainMenuUI) {
-                        g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
-                    }
-                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
-                    break;
-
-                case UIState::MERCHANT:
-                    // TODO: Create MerchantUI class
-                    // For now, redirect to main menu
-                    if (!g_mainMenuUI) {
-                        g_mainMenuUI = new MainMenuUI(g_networkClient, g_loginUI->getAccountId());
-                    }
-                    g_uiManager->setState(UIState::MAIN_MENU, g_mainMenuUI);
-                    break;
-
-                case UIState::IN_GAME:
-                    if (!g_gameClient) {
-                        g_gameClient = new GameClient(g_networkClient, g_loginUI->getAccountId());
-                    }
-                    g_uiManager->setState(UIState::IN_GAME, g_gameClient);
-                    break;
-
-                case UIState::LOGIN:
-                    // Cleanup UI instances on logout
-                    if (g_gameClient) {
-                        delete g_gameClient;
-                        g_gameClient = nullptr;
-                    }
-                    if (g_mainMenuUI) {
-                        delete g_mainMenuUI;
-                        g_mainMenuUI = nullptr;
-                    }
-                    if (g_lobbyUI) {
-                        delete g_lobbyUI;
-                        g_lobbyUI = nullptr;
-                    }
-                    g_uiManager->setState(UIState::LOGIN, g_loginUI);
-                    break;
-
-                default:
-                    break;
-            }
-
-            g_uiManager->resetTransition();
-        }
-
-        // Render
-        g_uiManager->render();
+        // Render current scene
+        g_sceneManager->render();
 
         // Swap buffers
         SwapBuffers(g_hdc);

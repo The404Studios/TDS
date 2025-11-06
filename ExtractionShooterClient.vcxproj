@@ -153,6 +153,18 @@
     <ClCompile Include="src\client\ui\MainMenuUI.cpp" />
     <ClCompile Include="src\client\ui\GameClient.cpp" />
     <ClCompile Include="src\client\network\NetworkClient.cpp" />
+    <!-- New Scene System -->
+    <ClCompile Include="src\client\ui\GameObject.cpp" />
+    <ClCompile Include="src\client\ui\Scene.cpp" />
+    <ClCompile Include="src\client\ui\SceneManager.cpp" />
+    <ClCompile Include="src\client\ui\ThreadPool.cpp" />
+    <ClCompile Include="src\client\ui\Scheduler.cpp" />
+    <ClCompile Include="src\client\ui\UIElement.cpp" />
+    <ClCompile Include="src\client\ui\UIPanel.cpp" />
+    <ClCompile Include="src\client\ui\UIText.cpp" />
+    <ClCompile Include="src\client\ui\UIButton.cpp" />
+    <ClCompile Include="src\client\ui\LoginScene.cpp" />
+    <ClCompile Include="src\client\ui\MainMenuScene.cpp" />
   </ItemGroup>
   <!-- Header Files - Common -->
   <ItemGroup>
@@ -169,6 +181,18 @@
     <ClInclude Include="src\client\ui\MainMenuUI.h" />
     <ClInclude Include="src\client\ui\GameClient.h" />
     <ClInclude Include="src\client\network\NetworkClient.h" />
+    <!-- New Scene System Headers -->
+    <ClInclude Include="src\client\ui\GameObject.h" />
+    <ClInclude Include="src\client\ui\Scene.h" />
+    <ClInclude Include="src\client\ui\SceneManager.h" />
+    <ClInclude Include="src\client\ui\ThreadPool.h" />
+    <ClInclude Include="src\client\ui\Scheduler.h" />
+    <ClInclude Include="src\client\ui\UIElement.h" />
+    <ClInclude Include="src\client\ui\UIPanel.h" />
+    <ClInclude Include="src\client\ui\UIText.h" />
+    <ClInclude Include="src\client\ui\UIButton.h" />
+    <ClInclude Include="src\client\ui\LoginScene.h" />
+    <ClInclude Include="src\client\ui\MainMenuScene.h" />
   </ItemGroup>
   <!-- Documentation -->
   <ItemGroup>
