@@ -9,8 +9,11 @@
 #include <map>
 #include <random>
 
-// Limb health system
-struct LimbHealth {
+// Forward declarations to avoid redefinition with DataStructures.h
+// Use the common LootSpawn from DataStructures.h
+
+// Client-specific structs (not in common)
+struct ClientLimbHealth {
     float head = 35.0f;
     float thorax = 80.0f;
     float stomach = 70.0f;
@@ -24,23 +27,23 @@ struct LimbHealth {
     }
 };
 
-// Loot spawn
-struct LootSpawn {
+// Simple loot spawn for client-side only
+struct ClientLootSpawn {
     float x, y, z;
     ItemType itemType;
-    bool collected = false;
+    bool collected;
 };
 
-// House structure
-struct House {
-    float x, z;  // Center position
+// House structure (client-side only)
+struct ClientHouse {
+    float x, z;
     float width, height, depth;
     bool hasLoot;
-    std::vector<LootSpawn> loot;
+    std::vector<ClientLootSpawn> loot;
 };
 
-// Enemy AI
-struct Enemy {
+// Enemy (client-side simplified version)
+struct ClientEnemy {
     uint32_t id;
     float x, y, z;
     float yaw;
@@ -50,22 +53,22 @@ struct Enemy {
     float patrolAngle;
 };
 
-// Extract point
-struct ExtractionPoint {
+// Extract point (client-side)
+struct ClientExtractionPoint {
     float x, z;
     float radius;
     std::string name;
 };
 
-// Tree
-struct Tree {
+// Tree (client-side)
+struct ClientTree {
     float x, z;
     float height;
     float radius;
 };
 
-// Inventory item
-struct InventoryItem {
+// Inventory item (client-side)
+struct ClientInventoryItem {
     ItemType type;
     int count;
     int maxStack;
@@ -91,7 +94,7 @@ private:
     float playerYaw, playerPitch;
     float leanAngle;  // For Q/E leaning
     bool isLeaning;
-    LimbHealth limbHealth;
+    ClientLimbHealth limbHealth;
     bool alive;
     bool extracted;
 
@@ -102,7 +105,7 @@ private:
     // Inventory
     bool showInventory;
     float inventoryAnimProgress;
-    std::vector<InventoryItem> inventory;
+    std::vector<ClientInventoryItem> inventory;
     int selectedSlot;
 
     // Magazine check
@@ -117,11 +120,11 @@ private:
     float terrainScale;
 
     // World objects
-    std::vector<LootSpawn> lootSpawns;
-    std::vector<House> houses;
-    std::vector<ExtractionPoint> extractionPoints;
-    std::vector<Enemy> enemies;
-    std::vector<Tree> trees;
+    std::vector<ClientLootSpawn> lootSpawns;
+    std::vector<ClientHouse> houses;
+    std::vector<ClientExtractionPoint> extractionPoints;
+    std::vector<ClientEnemy> enemies;
+    std::vector<ClientTree> trees;
 
     // Other players (for PvP)
     std::map<uint64_t, struct OtherPlayer> otherPlayers;
@@ -177,7 +180,7 @@ private:
     float getTerrainHeight(float x, float z);
     bool isInsideHouse(float x, float z);
     bool isNearExtraction();
-    ExtractionPoint* getNearestExtraction();
+    ClientExtractionPoint* getNearestExtraction();
 
     // Network
     void sendPositionUpdate();

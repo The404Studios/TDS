@@ -25,25 +25,25 @@ GameClient::GameClient(NetworkClient* netClient, uint64_t accId)
       timeOfDay(12.0f), sunAngle(0.0f), rng(std::random_device{}())
 {
     // Initialize inventory with starter gear
-    InventoryItem weapon;
+    ClientInventoryItem weapon;
     weapon.type = ItemType::WEAPON;
     weapon.count = 1;
     weapon.maxStack = 1;
     inventory.push_back(weapon);
 
-    InventoryItem armor;
+    ClientInventoryItem armor;
     armor.type = ItemType::ARMOR;
     armor.count = 1;
     armor.maxStack = 1;
     inventory.push_back(armor);
 
-    InventoryItem medical;
+    ClientInventoryItem medical;
     medical.type = ItemType::MEDICAL;
     medical.count = 2;
     medical.maxStack = 5;
     inventory.push_back(medical);
 
-    InventoryItem ammo;
+    ClientInventoryItem ammo;
     ammo.type = ItemType::AMMO;
     ammo.count = 120;
     ammo.maxStack = 200;
@@ -287,7 +287,7 @@ void GameClient::generateTrees() {
     std::uniform_real_distribution<float> radiusDist(1.0f, 2.0f);
 
     for (int i = 0; i < 500; i++) {  // 500 trees
-        Tree tree;
+        ClientTree tree;
         tree.x = posDist(rng);
         tree.z = posDist(rng);
         tree.height = heightDist(rng);
@@ -300,7 +300,7 @@ void GameClient::generateHouses() {
     std::uniform_real_distribution<float> posDist(-150.0f, 150.0f);
 
     for (int i = 0; i < 10; i++) {  // 10 houses
-        House house;
+        ClientHouse house;
         house.x = posDist(rng);
         house.z = posDist(rng);
         house.width = 15.0f;
@@ -310,11 +310,12 @@ void GameClient::generateHouses() {
 
         // Add loot inside house
         for (int j = 0; j < 3; j++) {
-            LootSpawn loot;
+            ClientLootSpawn loot;
             loot.x = house.x + (rand() % 10 - 5);
             loot.z = house.z + (rand() % 8 - 4);
             loot.y = getTerrainHeight(loot.x, loot.z) + 0.5f;
             loot.itemType = static_cast<ItemType>(rand() % 10);
+            loot.collected = false;
             house.loot.push_back(loot);
         }
 
@@ -326,27 +327,33 @@ void GameClient::generateLoot() {
     std::uniform_real_distribution<float> posDist(-200.0f, 200.0f);
 
     for (int i = 0; i < 100; i++) {  // 100 random loot spawns
-        LootSpawn loot;
+        ClientLootSpawn loot;
         loot.x = posDist(rng);
         loot.z = posDist(rng);
         loot.y = getTerrainHeight(loot.x, loot.z) + 0.5f;
         loot.itemType = static_cast<ItemType>(rand() % 20);
+        loot.collected = false;
         lootSpawns.push_back(loot);
     }
 }
 
 void GameClient::generateExtractionPoints() {
-    extractionPoints.push_back({-180.0f, -180.0f, 15.0f, "Northwest Extract"});
-    extractionPoints.push_back({180.0f, 180.0f, 15.0f, "Southeast Extract"});
-    extractionPoints.push_back({-180.0f, 180.0f, 15.0f, "Southwest Extract"});
-    extractionPoints.push_back({180.0f, -180.0f, 15.0f, "Northeast Extract"});
+    ClientExtractionPoint nw = {-180.0f, -180.0f, 15.0f, "Northwest Extract"};
+    ClientExtractionPoint se = {180.0f, 180.0f, 15.0f, "Southeast Extract"};
+    ClientExtractionPoint sw = {-180.0f, 180.0f, 15.0f, "Southwest Extract"};
+    ClientExtractionPoint ne = {180.0f, -180.0f, 15.0f, "Northeast Extract"};
+
+    extractionPoints.push_back(nw);
+    extractionPoints.push_back(se);
+    extractionPoints.push_back(sw);
+    extractionPoints.push_back(ne);
 }
 
 void GameClient::generateEnemies() {
     std::uniform_real_distribution<float> posDist(-150.0f, 150.0f);
 
     for (int i = 0; i < 15; i++) {  // 15 enemies
-        Enemy enemy;
+        ClientEnemy enemy;
         enemy.id = i;
         enemy.x = posDist(rng);
         enemy.z = posDist(rng);
@@ -627,7 +634,7 @@ void GameClient::renderHUD() {
     TextRenderer::drawText("WASD-Move Q/E-Lean TAB-Inv Alt+T-Mag F-Interact", -0.95f, -0.95f, 0.65f);
 
     // Extraction prompt
-    ExtractionPoint* nearest = getNearestExtraction();
+    ClientExtractionPoint* nearest = getNearestExtraction();
     if (nearest) {
         float dx = nearest->x - playerX;
         float dz = nearest->z - playerZ;
@@ -926,7 +933,7 @@ void GameClient::checkLootPickup() {
             }
 
             if (!found) {
-                InventoryItem newItem;
+                ClientInventoryItem newItem;
                 newItem.type = loot.itemType;
                 newItem.count = 1;
                 newItem.maxStack = 100;
@@ -973,7 +980,7 @@ bool GameClient::isNearExtraction() {
     return getNearestExtraction() != nullptr;
 }
 
-ExtractionPoint* GameClient::getNearestExtraction() {
+ClientExtractionPoint* GameClient::getNearestExtraction() {
     for (auto& extract : extractionPoints) {
         float dx = extract.x - playerX;
         float dz = extract.z - playerZ;
