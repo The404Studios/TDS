@@ -136,6 +136,45 @@ void LoginUI::handleInput(char key) {
     }
 }
 
+void LoginUI::handleMouseClick(float x, float y) {
+    if (waitingForResponse) return;  // Ignore input while waiting
+
+    // Check username field (-0.35f, 0.3f, 0.7f, 0.08f)
+    if (isPointInRect(x, y, -0.35f, 0.3f, 0.7f, 0.08f)) {
+        selectedField = 0;
+        return;
+    }
+
+    // Check password field (-0.35f, 0.05f, 0.7f, 0.08f)
+    if (isPointInRect(x, y, -0.35f, 0.05f, 0.7f, 0.08f)) {
+        selectedField = 1;
+        return;
+    }
+
+    // Check email field (register mode only) (-0.35f, -0.2f, 0.7f, 0.08f)
+    if (mode == Mode::REGISTER) {
+        if (isPointInRect(x, y, -0.35f, -0.2f, 0.7f, 0.08f)) {
+            selectedField = 2;
+            return;
+        }
+    }
+
+    // Calculate button Y position
+    float buttonY = (mode == Mode::LOGIN) ? -0.15f : -0.35f;
+
+    // Check Login/Register button (-0.2f, buttonY, 0.4f, 0.08f)
+    if (isPointInRect(x, y, -0.2f, buttonY, 0.4f, 0.08f)) {
+        submitAction();
+        return;
+    }
+
+    // Check switch mode button (-0.2f, buttonY - 0.12f, 0.4f, 0.08f)
+    if (isPointInRect(x, y, -0.2f, buttonY - 0.12f, 0.4f, 0.08f)) {
+        toggleMode();
+        return;
+    }
+}
+
 void LoginUI::submitAction() {
     errorMessage.clear();
     statusMessage.clear();

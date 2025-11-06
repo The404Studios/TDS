@@ -78,6 +78,35 @@ void LobbyUI::handleInput(char key) {
     }
 }
 
+void LobbyUI::handleMouseClick(float x, float y) {
+    if (!inLobby) {
+        // Lobby selection screen - no clickable buttons, but we could add them
+        // For now, users use keyboard shortcuts
+    } else {
+        // In lobby screen
+
+        // Check Toggle Ready button (-0.3f, -0.2f, 0.25f, 0.08f)
+        if (isPointInRect(x, y, -0.3f, -0.2f, 0.25f, 0.08f)) {
+            toggleReady();
+            return;
+        }
+
+        // Check Leave Lobby button (0.0f, -0.2f, 0.25f, 0.08f)
+        if (isPointInRect(x, y, 0.0f, -0.2f, 0.25f, 0.08f)) {
+            leaveLobby();
+            return;
+        }
+
+        // Check Start Queue button (owner only) (-0.3f, -0.35f, 0.55f, 0.08f)
+        if (isOwner && !inQueue) {
+            if (isPointInRect(x, y, -0.3f, -0.35f, 0.55f, 0.08f)) {
+                startQueue();
+                return;
+            }
+        }
+    }
+}
+
 void LobbyUI::renderLobbySelection() {
     // Draw main menu panel
     drawPanel(-0.5f, 0.2f, 1.0f, 0.5f, "Lobby Selection");

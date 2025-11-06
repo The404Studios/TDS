@@ -13,6 +13,7 @@ public:
     void update(float deltaTime) override;
     void render() override;
     void handleInput(char key) override;
+    void handleMouseClick(float x, float y) override;
 
     void setPlayerStats(const PlayerStats& stats) {
         playerStats = stats;

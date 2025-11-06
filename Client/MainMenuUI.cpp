@@ -101,6 +101,39 @@ void MainMenuUI::handleInput(char key) {
     }
 }
 
+void MainMenuUI::handleMouseClick(float x, float y) {
+    // Menu options are displayed starting at y=0.65f with 0.1f spacing
+    // Each option is clickable in a region around the text
+
+    // Option 0: View Stash (y: 0.60 to 0.68)
+    if (isPointInRect(x, y, 0.0f, 0.60f, 0.5f, 0.08f)) {
+        selectedOption = 0;
+        selectOption();
+        return;
+    }
+
+    // Option 1: Visit Merchants (y: 0.50 to 0.58)
+    if (isPointInRect(x, y, 0.0f, 0.50f, 0.5f, 0.08f)) {
+        selectedOption = 1;
+        selectOption();
+        return;
+    }
+
+    // Option 2: Enter Lobby (y: 0.40 to 0.48)
+    if (isPointInRect(x, y, 0.0f, 0.40f, 0.5f, 0.08f)) {
+        selectedOption = 2;
+        selectOption();
+        return;
+    }
+
+    // Option 3: Logout (y: 0.30 to 0.38)
+    if (isPointInRect(x, y, 0.0f, 0.30f, 0.5f, 0.08f)) {
+        selectedOption = 3;
+        selectOption();
+        return;
+    }
+}
+
 void MainMenuUI::selectOption() {
     switch (selectedOption) {
         case 0:  // View Stash

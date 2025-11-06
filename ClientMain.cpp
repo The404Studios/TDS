@@ -26,6 +26,15 @@ HDC g_hdc = nullptr;
 HGLRC g_hglrc = nullptr;
 bool g_running = true;
 
+// Window dimensions and aspect ratio
+int g_windowWidth = 1280;
+int g_windowHeight = 720;
+float g_aspectRatio = 16.0f / 9.0f;
+
+// Mouse state
+float g_mouseX = 0.0f;
+float g_mouseY = 0.0f;
+
 NetworkClient* g_networkClient = nullptr;
 UIManager* g_uiManager = nullptr;
 
@@ -51,7 +60,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return 0;
 
         case WM_SIZE:
-            glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
+            // Update window dimensions
+            g_windowWidth = LOWORD(lParam);
+            g_windowHeight = HIWORD(lParam);
+            if (g_windowHeight > 0) {
+                g_aspectRatio = (float)g_windowWidth / (float)g_windowHeight;
+                if (g_uiManager) {
+                    g_uiManager->setAspectRatio(g_aspectRatio);
+                }
+            }
+            glViewport(0, 0, g_windowWidth, g_windowHeight);
+            return 0;
+
+        case WM_MOUSEMOVE:
+            {
+                // Get mouse position in screen coordinates
+                int screenX = LOWORD(lParam);
+                int screenY = HIWORD(lParam);
+
+                // Convert to OpenGL coordinates (centered coordinate system)
+                // X: -aspectRatio/2 to aspectRatio/2
+                // Y: -1 to 1 (flipped)
+                float halfAspect = g_aspectRatio / 2.0f;
+                g_mouseX = (screenX / (float)g_windowWidth) * g_aspectRatio - halfAspect;
+                g_mouseY = 1.0f - (screenY / (float)g_windowHeight) * 2.0f;
+
+                // Forward mouse position to UI manager
+                if (g_uiManager) {
+                    g_uiManager->setMousePosition(g_mouseX, g_mouseY);
+                }
+            }
+            return 0;
+
+        case WM_LBUTTONDOWN:
+            {
+                // Get mouse position in screen coordinates
+                int screenX = LOWORD(lParam);
+                int screenY = HIWORD(lParam);
+
+                // Convert to OpenGL coordinates (centered coordinate system)
+                float halfAspect = g_aspectRatio / 2.0f;
+                float glX = (screenX / (float)g_windowWidth) * g_aspectRatio - halfAspect;
+                float glY = 1.0f - (screenY / (float)g_windowHeight) * 2.0f;
+
+                // Forward click to UI manager
+                if (g_uiManager) {
+                    g_uiManager->handleMouseClick(glX, glY);
+                }
+            }
             return 0;
     }
 
@@ -96,6 +152,16 @@ bool initializeOpenGL() {
     // Initialize OpenGL settings
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+
+    // Set up 2D orthographic projection for UI
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    // Use aspect ratio-aware orthographic projection centered at origin
+    // X: -aspectRatio/2 to aspectRatio/2, Y: -1 to 1
+    float halfAspect = g_aspectRatio / 2.0f;
+    glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     ShowWindow(g_hwnd, SW_SHOW);
     UpdateWindow(g_hwnd);
@@ -157,6 +223,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Create UI manager
     g_uiManager = new UIManager();
+    g_uiManager->setAspectRatio(g_aspectRatio);
 
     // Create login UI (starting state)
     g_loginUI = new LoginUI(g_networkClient);

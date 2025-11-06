@@ -16,6 +16,7 @@ public:
     void update(float deltaTime) override;
     void render() override;
     void handleInput(char key) override;
+    void handleMouseClick(float x, float y) override;
 
     uint64_t getAccountId() const {
         return accountId;

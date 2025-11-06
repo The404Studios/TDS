@@ -43,16 +43,23 @@ void BaseUI::drawBox(float x, float y, float width, float height, bool filled) {
 }
 
 void BaseUI::drawButton(float x, float y, float width, float height, const std::string& text, bool highlighted) {
+    // Check if mouse is hovering over this button
+    bool isHovering = isPointInRect(mouseX, mouseY, x, y, width, height);
+
     // Draw button background
-    if (highlighted) {
-        glColor3f(0.3f, 0.5f, 0.8f);  // Blue when highlighted
+    if (highlighted || isHovering) {
+        glColor3f(0.3f, 0.5f, 0.8f);  // Blue when highlighted or hovering
     } else {
         glColor3f(0.2f, 0.2f, 0.2f);  // Dark gray
     }
     drawBox(x, y, width, height, true);
 
     // Draw button border
-    glColor3f(0.8f, 0.8f, 0.8f);  // Light gray
+    if (isHovering) {
+        glColor3f(1.0f, 1.0f, 1.0f);  // White border when hovering
+    } else {
+        glColor3f(0.8f, 0.8f, 0.8f);  // Light gray
+    }
     drawBox(x, y, width, height, false);
 
     // Draw text
@@ -168,6 +175,30 @@ void UIManager::handleInput(char key) {
     if (currentUI) {
         currentUI->handleInput(key);
     }
+}
+
+void UIManager::handleMouseClick(float x, float y) {
+    if (currentUI) {
+        currentUI->handleMouseClick(x, y);
+    }
+}
+
+void UIManager::setMousePosition(float x, float y) {
+    if (currentUI) {
+        currentUI->setMousePosition(x, y);
+    }
+}
+
+void UIManager::setAspectRatio(float aspect) {
+    aspectRatio = aspect;
+
+    // Update projection matrix (centered coordinate system)
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    float halfAspect = aspectRatio / 2.0f;
+    glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 bool UIManager::shouldChangeState() const {
