@@ -1,4 +1,5 @@
 #include "NetworkClient.h"
+#include <cstring>
 
 NetworkClient::NetworkClient() : serverSocket(INVALID_SOCKET), initialized(false),
                   connected(false), sessionToken(0), sequenceOut(0) {

@@ -1,5 +1,6 @@
 #include "NetworkServer.h"
 #include <iostream>
+#include <cstring>
 
 NetworkServer::NetworkServer() : listenSocket(INVALID_SOCKET), initialized(false), running(false) {
     // Initialize Winsock

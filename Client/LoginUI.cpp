@@ -1,5 +1,6 @@
 #include "LoginUI.h"
 #include <iostream>
+#include <cstring>
 
 void LoginUI::update(float deltaTime) {
     // Check for server responses

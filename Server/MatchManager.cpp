@@ -1,6 +1,7 @@
 #include "MatchManager.h"
 #include <iostream>
 #include <random>
+#include <cstring>
 
 MatchManager::MatchManager() : nextMatchId(1) {
     initializeExtractionZones();

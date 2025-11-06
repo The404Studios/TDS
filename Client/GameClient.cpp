@@ -1,5 +1,6 @@
 #include "GameClient.h"
 #include <iostream>
+#include <cstring>
 
 // Manual gluPerspective implementation (GLU might not be available)
 static void myPerspective(double fovy, double aspect, double zNear, double zFar) {

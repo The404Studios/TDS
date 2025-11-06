@@ -1,4 +1,8 @@
 #include "UIManager.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <gl/GL.h>
 
 // TextRenderer implementations
 void TextRenderer::drawText(const std::string& text, float x, float y, float size) {

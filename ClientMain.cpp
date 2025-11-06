@@ -1,17 +1,21 @@
 // Extraction Shooter - Client Entry Point
 // Multiplayer Tarkov-style extraction shooter with lobby system
 
+// IMPORTANT: Include winsock2 BEFORE windows.h to avoid conflicts
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#include <iostream>
+#include <chrono>
+
 #include "Client/NetworkClient.h"
 #include "Client/UIManager.h"
 #include "Client/LoginUI.h"
 #include "Client/LobbyUI.h"
 #include "Client/MainMenuUI.h"
 #include "Client/GameClient.h"
-#include <windows.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
-#include <iostream>
-#include <chrono>
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")

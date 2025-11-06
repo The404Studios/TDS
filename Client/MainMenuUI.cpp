@@ -1,4 +1,5 @@
 #include "MainMenuUI.h"
+#include <cstring>
 
 void MainMenuUI::update(float deltaTime) {
     // Process packets if needed

@@ -1,4 +1,5 @@
 #pragma once
+#include "DataStructures.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -319,16 +320,7 @@ struct MerchantTransactionResponse {
 // PLAYER DATA PACKETS
 // ============================================================================
 
-struct PlayerStats {
-    uint32_t level;
-    uint32_t experience;
-    uint32_t roubles;
-    uint32_t raidsCompleted;
-    uint32_t raidsExtracted;
-    uint32_t raidsDied;
-    uint32_t kills;
-    uint32_t deaths;
-};
+// PlayerStats is defined in DataStructures.h
 
 struct ItemData {
     uint32_t itemId;

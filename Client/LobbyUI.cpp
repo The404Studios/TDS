@@ -1,5 +1,6 @@
 #include "LobbyUI.h"
 #include <iostream>
+#include <cstring>
 
 void LobbyUI::update(float deltaTime) {
     // Process server packets
