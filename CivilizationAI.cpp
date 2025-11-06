@@ -558,6 +558,14 @@ float FactionManager::getAverageHealth() const {
     return total / agents.size();
 }
 
+float FactionManager::getTotalResources() const {
+    float total = 0;
+    for (int resource : resources) {
+        total += resource;
+    }
+    return total;
+}
+
 // World Implementation
 World::World() : currentGeneration(0), generationTimer(0),
 uniformDist(0, 1), timeOfDay(12.0f), weatherIntensity(0.5f) {
