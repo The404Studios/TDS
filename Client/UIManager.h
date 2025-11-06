@@ -2,7 +2,6 @@
 #include "../Common/DataStructures.h"
 #include <string>
 #include <vector>
-#include <gl/GL.h>
 
 // UI State enum
 enum class UIState {
