@@ -121,7 +121,12 @@ struct PlayerData {
     std::vector<Item> stash;         // Persistent stash
     std::vector<Item> loadout;       // Current equipped gear
 
-    PlayerData() : accountId(0) {}
+    // Character state
+    float health;
+    float maxHealth;
+    int factionId;                   // Faction/team ID
+
+    PlayerData() : accountId(0), health(100.0f), maxHealth(100.0f), factionId(0) {}
 };
 
 // ============================================================================
