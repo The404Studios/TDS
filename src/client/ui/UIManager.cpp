@@ -1,8 +1,5 @@
 #include "UIManager.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <gl/GL.h>
+#include "../../engine/core/Platform.h"
 
 // Global font display list
 static GLuint g_fontBase = 0;

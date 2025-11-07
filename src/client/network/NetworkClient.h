@@ -1,14 +1,11 @@
 #pragma once
+#include "../../engine/core/Platform.h"
 #include "../../common/NetworkProtocol.h"
 #include "../../common/DataStructures.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <vector>
 #include <queue>
 #include <string>
 #include <iostream>
-
-#pragma comment(lib, "ws2_32.lib")
 
 // Client-side network manager
 class NetworkClient {

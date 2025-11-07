@@ -1,7 +1,6 @@
 #pragma once
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include "../core/Platform.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -9,8 +8,7 @@
 #include <functional>
 #include <queue>
 #include <mutex>
-
-#pragma comment(lib, "ws2_32.lib")
+#include <cstring>
 
 // Network protocol types
 enum class NetProtocol {

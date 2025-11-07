@@ -1,8 +1,7 @@
 #pragma once
 
+#include "../../engine/core/Platform.h"
 #include "GameObject.h"
-#include <windows.h>
-#include <GL/gl.h>
 #include <functional>
 
 // Color struct

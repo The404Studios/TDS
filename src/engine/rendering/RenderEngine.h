@@ -1,10 +1,9 @@
 #pragma once
 
+#include "../core/Platform.h"
 #include <vector>
 #include <memory>
-#include <windows.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <cmath>
 
 // Math structures
 struct Vec3 {

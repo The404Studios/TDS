@@ -1,8 +1,5 @@
 #include "MainMenuUI.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <gl/GL.h>
+#include "../../engine/core/Platform.h"
 #include <cstring>
 #include <cmath>
 

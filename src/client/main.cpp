@@ -1,12 +1,7 @@
 // Extraction Shooter - Client Entry Point with Scene Management
 // Completely redesigned with hierarchical scene system, threading, and scheduling
 
-// IMPORTANT: Include winsock2 BEFORE windows.h to avoid conflicts
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include "../engine/core/Platform.h"
 #include <iostream>
 #include <chrono>
 #include <memory>
@@ -16,9 +11,6 @@
 #include "ui/LoginScene.h"
 #include "ui/MainMenuScene.h"
 #include "ui/UIText.h"
-
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glu32.lib")
 
 // Global variables
 HWND g_hwnd = nullptr;
