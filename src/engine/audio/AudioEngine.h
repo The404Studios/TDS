@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <algorithm>
 
 // Audio source state
 enum class AudioState {
@@ -32,11 +33,11 @@ public:
     ResourceHandle<AudioClip> getClip() const { return clip; }
 
     // Volume
-    void setVolume(float vol) { volume = std::max(0.0f, std::min(1.0f, vol)); }
+    void setVolume(float vol) { volume = (std::max)(0.0f, (std::min)(1.0f, vol)); }
     float getVolume() const { return volume; }
 
     // Pitch
-    void setPitch(float p) { pitch = std::max(0.1f, std::min(3.0f, p)); }
+    void setPitch(float p) { pitch = (std::max)(0.1f, (std::min)(3.0f, p)); }
     float getPitch() const { return pitch; }
 
     // 3D Audio
@@ -56,7 +57,7 @@ public:
     float getRolloffFactor() const { return rolloffFactor; }
 
     // Panning
-    void setPan(float p) { pan = std::max(-1.0f, std::min(1.0f, p)); }
+    void setPan(float p) { pan = (std::max)(-1.0f, (std::min)(1.0f, p)); }
     float getPan() const { return pan; }
 
     // Priority

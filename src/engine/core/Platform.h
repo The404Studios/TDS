@@ -1,5 +1,15 @@
 #pragma once
 
+// Prevent Windows min/max macros FIRST before any includes
+#ifdef _WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN
+    #endif
+#endif
+
 // Platform-specific includes
 // IMPORTANT: winsock2.h MUST be included before windows.h to avoid redefinition errors
 
@@ -12,8 +22,6 @@
 
     // Now include windows
     #ifndef _WINDOWS_
-        #define WIN32_LEAN_AND_MEAN
-        #define NOMINMAX  // Prevent min/max macros
         #include <windows.h>
     #endif
 
