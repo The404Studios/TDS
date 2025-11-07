@@ -1,5 +1,5 @@
 #include "LoginScene.h"
-#include "../../common/PacketTypes.h"
+#include "../../common/NetworkProtocol.h"
 #include <cmath>
 
 LoginScene::LoginScene(NetworkClient* netClient)
@@ -199,7 +199,7 @@ void LoginScene::attemptLogin() {
     LoginRequest req;
     strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
     strncpy_s(req.password, password.c_str(), sizeof(req.password) - 1);
-    networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
 }
 
 void LoginScene::attemptRegister() {
@@ -223,7 +223,7 @@ void LoginScene::attemptRegister() {
     strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
     strncpy_s(req.password, password.c_str(), sizeof(req.password) - 1);
     strncpy_s(req.email, email.c_str(), sizeof(req.email) - 1);
-    networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
 }
 
 void LoginScene::processNetworkPackets() {

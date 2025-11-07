@@ -8,7 +8,9 @@
 static void myPerspective(double fovy, double aspect, double zNear, double zFar) {
     double fH = std::tan(fovy / 360.0 * 3.14159265) * zNear;
     double fW = fH * aspect;
-    glFrustum(-fW, fW, -fH, fH, zNear, zFar);
+    glFrustum(static_cast<GLdouble>(-fW), static_cast<GLdouble>(fW),
+              static_cast<GLdouble>(-fH), static_cast<GLdouble>(fH),
+              static_cast<GLdouble>(zNear), static_cast<GLdouble>(zFar));
 }
 
 GameClient::GameClient(NetworkClient* netClient, uint64_t accId)
@@ -1000,7 +1002,7 @@ void GameClient::sendPositionUpdate() {
     move.pitch = playerPitch;
     move.movementFlags = 0;
 
-    networkClient->sendPacket(PacketType::PLAYER_MOVE, &move, sizeof(move));
+    networkClient->sendPacket(PacketType::PLAYER_MOVE, &move, static_cast<uint32_t>(sizeof(move)));
 }
 
 void GameClient::handleSpawnInfo(const std::vector<uint8_t>& payload) {

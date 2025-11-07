@@ -335,7 +335,7 @@ void LoginUI::sendLoginRequest() {
     strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
     strncpy_s(req.passwordHash, passwordHash.c_str(), sizeof(req.passwordHash) - 1);
 
-    networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
     waitingForResponse = true;
 }
 
@@ -349,7 +349,7 @@ void LoginUI::sendRegisterRequest() {
     strncpy_s(req.passwordHash, passwordHash.c_str(), sizeof(req.passwordHash) - 1);
     strncpy_s(req.email, email.c_str(), sizeof(req.email) - 1);
 
-    networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
     waitingForResponse = true;
 }
 

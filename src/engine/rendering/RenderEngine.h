@@ -18,10 +18,10 @@ struct Vec3 {
     Vec3 cross(const Vec3& v) const {
         return Vec3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
     }
-    float length() const { return std::sqrt(x * x + y * y + z * z); }
+    float length() const { return std::sqrtf(x * x + y * y + z * z); }
     Vec3 normalized() const {
         float len = length();
-        return len > 0 ? Vec3(x / len, y / len, z / len) : Vec3(0, 0, 0);
+        return len > 0.0f ? Vec3(x / len, y / len, z / len) : Vec3(0.0f, 0.0f, 0.0f);
     }
 };
 
@@ -90,10 +90,10 @@ struct Light {
     GLuint shadowMapTexture;
     Mat4 shadowMatrix;
 
-    Light() : type(LightType::DIRECTIONAL), intensity(1.0f),
-              constant(1.0f), linear(0.09f), quadratic(0.032f),
+    Light() : type(LightType::DIRECTIONAL), position(), direction(), color(),
+              intensity(1.0f), constant(1.0f), linear(0.09f), quadratic(0.032f),
               innerCone(0.9f), outerCone(0.95f), castShadows(true),
-              shadowMapSize(1024), shadowMapTexture(0) {}
+              shadowMapSize(1024), shadowMapTexture(0), shadowMatrix() {}
 };
 
 // Material properties

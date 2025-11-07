@@ -1,15 +1,9 @@
 #pragma once
 
 #include "../../engine/core/Platform.h"
+#include "../../engine/rendering/RenderEngine.h"
 #include "GameObject.h"
 #include <functional>
-
-// Color struct
-struct Color {
-    float r, g, b, a;
-    Color() : r(1), g(1), b(1), a(1) {}
-    Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
-};
 
 // Base UI Element class
 class UIElement : public GameObject {

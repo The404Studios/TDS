@@ -174,7 +174,7 @@ void LobbyUI::createLobby() {
     req.maxPlayers = 5;
     req.isPrivate = false;
 
-    networkClient->sendPacket(PacketType::LOBBY_CREATE, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::LOBBY_CREATE, &req, static_cast<uint32_t>(sizeof(req)));
     statusMessage = "Creating lobby...";
 }
 
@@ -182,7 +182,7 @@ void LobbyUI::toggleReady() {
     LobbyReady req;
     req.ready = !isReady;
 
-    networkClient->sendPacket(PacketType::LOBBY_READY, &req, sizeof(req));
+    networkClient->sendPacket(PacketType::LOBBY_READY, &req, static_cast<uint32_t>(sizeof(req)));
 }
 
 void LobbyUI::leaveLobby() {

@@ -53,20 +53,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return 0;
 
         case WM_SIZE:
-            // Update window dimensions
-            g_windowWidth = LOWORD(lParam);
-            g_windowHeight = HIWORD(lParam);
-            if (g_windowHeight > 0) {
-                g_aspectRatio = (float)g_windowWidth / (float)g_windowHeight;
-            }
-            glViewport(0, 0, g_windowWidth, g_windowHeight);
+            {
+                // Update window dimensions
+                g_windowWidth = LOWORD(lParam);
+                g_windowHeight = HIWORD(lParam);
+                if (g_windowHeight > 0) {
+                    g_aspectRatio = (float)g_windowWidth / (float)g_windowHeight;
+                }
+                glViewport(0, 0, g_windowWidth, g_windowHeight);
 
-            // Update projection matrix
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            float halfAspect = g_aspectRatio / 2.0f;
-            glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
-            glMatrixMode(GL_MODELVIEW);
+                // Update projection matrix
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                float halfAspect = g_aspectRatio / 2.0f;
+                glOrtho(-halfAspect, halfAspect, -1.0, 1.0, -1.0, 1.0);
+                glMatrixMode(GL_MODELVIEW);
+            }
             return 0;
 
         case WM_MOUSEMOVE:

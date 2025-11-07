@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../engine/rendering/RenderEngine.h"
+#include "GameObject.h"
 #include <functional>
 #include <memory>
 #include <vector>
@@ -153,20 +155,19 @@ private:
 // Transform animation (for GameObject)
 class TransformAnimation : public Animation {
 public:
-    TransformAnimation(class Transform* transform, AnimationTarget target,
+    TransformAnimation(Transform* transform, AnimationTarget target,
                       float from, float to, float duration, EasingType easing = EasingType::LINEAR);
 
     void apply() override;
 
 private:
-    class Transform* transform;
+    Transform* transform;
     AnimationTarget animTarget;
     float fromValue;
     float toValue;
 };
 
 // Color animation
-struct Color;
 class ColorAnimation : public Animation {
 public:
     ColorAnimation(Color* target, const Color& from, const Color& to,
