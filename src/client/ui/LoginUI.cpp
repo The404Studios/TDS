@@ -28,7 +28,7 @@ void LoginUI::render() {
     glLoadIdentity();
 
     // Animated title with pulse effect
-    float pulse = 0.85f + 0.15f * std::sin(animTime * 2.0f);
+    float pulse = 0.85f + 0.15f * std::sinf(animTime * 2.0f);
     glColor3f(pulse * 1.0f, pulse * 0.8f, pulse * 0.4f);
     TextRenderer::drawTextCentered("EXTRACTION SHOOTER", 0.75f, 2.0f);
 
@@ -111,7 +111,7 @@ void LoginUI::render() {
 
     // Button border with glow on hover
     if (btn1Hover) {
-        float glowPulse = 0.7f + 0.3f * std::sin(animTime * 8.0f);
+        float glowPulse = 0.7f + 0.3f * std::sinf(animTime * 8.0f);
         glColor3f(glowPulse, glowPulse * 0.8f, 1.0f);
         glLineWidth(3.0f);
     } else {
@@ -332,8 +332,8 @@ void LoginUI::sendLoginRequest() {
     LoginRequest req;
     std::string passwordHash = simpleHash(password);
 
-    strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
-    strncpy_s(req.passwordHash, passwordHash.c_str(), sizeof(req.passwordHash) - 1);
+    strncpy_s(req.username, sizeof(req.username), username.c_str(), sizeof(req.username) - 1);
+    strncpy_s(req.passwordHash, sizeof(req.passwordHash), passwordHash.c_str(), sizeof(req.passwordHash) - 1);
 
     networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
     waitingForResponse = true;
@@ -345,9 +345,9 @@ void LoginUI::sendRegisterRequest() {
     RegisterRequest req;
     std::string passwordHash = simpleHash(password);
 
-    strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
-    strncpy_s(req.passwordHash, passwordHash.c_str(), sizeof(req.passwordHash) - 1);
-    strncpy_s(req.email, email.c_str(), sizeof(req.email) - 1);
+    strncpy_s(req.username, sizeof(req.username), username.c_str(), sizeof(req.username) - 1);
+    strncpy_s(req.passwordHash, sizeof(req.passwordHash), passwordHash.c_str(), sizeof(req.passwordHash) - 1);
+    strncpy_s(req.email, sizeof(req.email), email.c_str(), sizeof(req.email) - 1);
 
     networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
     waitingForResponse = true;

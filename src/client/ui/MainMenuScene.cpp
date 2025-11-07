@@ -198,7 +198,7 @@ void MainMenuScene::update(float deltaTime) {
     animTime += deltaTime;
 
     // Animate title
-    float pulse = 0.85f + 0.15f * std::sin(animTime * 2.0f);
+    float pulse = 0.85f + 0.15f * std::sinf(animTime * 2.0f);
     titleText->setColor(Color(pulse, pulse * 0.85f, pulse * 0.5f, 1.0f));
 
     // Update info text based on hovered button

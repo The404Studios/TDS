@@ -203,7 +203,7 @@ void handleLoginRequest(uint64_t clientId, const std::vector<uint8_t>& payload) 
         std::cout << "[Server] Login failed: " << errorMsg << std::endl;
     }
 
-    g_networkServer->sendPacket(clientId, PacketType::LOGIN_RESPONSE, &resp, sizeof(resp));
+    g_networkServer->sendPacket(clientId, PacketType::LOGIN_RESPONSE, &resp, static_cast<uint32_t>(sizeof(resp)));
 }
 
 void handleRegisterRequest(uint64_t clientId, const std::vector<uint8_t>& payload) {
@@ -240,7 +240,7 @@ void handleRegisterRequest(uint64_t clientId, const std::vector<uint8_t>& payloa
         std::cout << "[Server] Registration failed: " << errorMsg << std::endl;
     }
 
-    g_networkServer->sendPacket(clientId, PacketType::REGISTER_RESPONSE, &resp, sizeof(resp));
+    g_networkServer->sendPacket(clientId, PacketType::REGISTER_RESPONSE, &resp, static_cast<uint32_t>(sizeof(resp)));
 }
 
 void handleLobbyCreate(uint64_t clientId, uint64_t sessionToken, const std::vector<uint8_t>& payload) {
@@ -250,7 +250,7 @@ void handleLobbyCreate(uint64_t clientId, uint64_t sessionToken, const std::vect
         ErrorResponse err;
         err.errorCode = 403;
         strncpy_s(err.errorMessage, "Invalid session", sizeof(err.errorMessage));
-        g_networkServer->sendPacket(clientId, PacketType::ERROR_RESPONSE, &err, sizeof(err));
+        g_networkServer->sendPacket(clientId, PacketType::ERROR_RESPONSE, &err, static_cast<uint32_t>(sizeof(err)));
         return;
     }
 
@@ -279,7 +279,7 @@ void handleLobbyCreate(uint64_t clientId, uint64_t sessionToken, const std::vect
         strncpy_s(resp.errorMessage, errorMsg.c_str(), sizeof(resp.errorMessage));
     }
 
-    g_networkServer->sendPacket(clientId, PacketType::LOBBY_CREATE_RESPONSE, &resp, sizeof(resp));
+    g_networkServer->sendPacket(clientId, PacketType::LOBBY_CREATE_RESPONSE, &resp, static_cast<uint32_t>(sizeof(resp)));
 }
 
 void handleLobbyJoin(uint64_t clientId, uint64_t sessionToken, const std::vector<uint8_t>& payload) {
@@ -312,7 +312,7 @@ void handleLobbyJoin(uint64_t clientId, uint64_t sessionToken, const std::vector
         strncpy_s(resp.errorMessage, errorMsg.c_str(), sizeof(resp.errorMessage));
     }
 
-    g_networkServer->sendPacket(clientId, PacketType::LOBBY_JOIN_RESPONSE, &resp, sizeof(resp));
+    g_networkServer->sendPacket(clientId, PacketType::LOBBY_JOIN_RESPONSE, &resp, static_cast<uint32_t>(sizeof(resp)));
 }
 
 void handleLobbyLeave(uint64_t clientId, uint64_t sessionToken) {
@@ -441,7 +441,7 @@ void handleMerchantBuy(uint64_t clientId, uint64_t sessionToken, const std::vect
         strncpy_s(resp.errorMessage, errorMsg.c_str(), sizeof(resp.errorMessage));
     }
 
-    g_networkServer->sendPacket(clientId, PacketType::MERCHANT_TRANSACTION_RESPONSE, &resp, sizeof(resp));
+    g_networkServer->sendPacket(clientId, PacketType::MERCHANT_TRANSACTION_RESPONSE, &resp, static_cast<uint32_t>(sizeof(resp)));
 }
 
 void handleMerchantSell(uint64_t clientId, uint64_t sessionToken, const std::vector<uint8_t>& payload) {
@@ -472,7 +472,7 @@ void updateMatchmaking() {
             for (const auto& member : lobby->members) {
                 uint64_t clientId;
                 if (g_authManager->getClientForAccount(member.accountId, clientId)) {
-                    g_networkServer->sendPacket(clientId, PacketType::MATCH_FOUND, &matchFound, sizeof(matchFound));
+                    g_networkServer->sendPacket(clientId, PacketType::MATCH_FOUND, &matchFound, static_cast<uint32_t>(sizeof(matchFound)));
                 }
             }
 
@@ -503,7 +503,7 @@ void sendLobbyUpdate(uint64_t lobbyId) {
     for (const auto& member : lobby->members) {
         uint64_t clientId;
         if (g_authManager->getClientForAccount(member.accountId, clientId)) {
-            g_networkServer->sendPacket(clientId, PacketType::LOBBY_UPDATE, &update, sizeof(update));
+            g_networkServer->sendPacket(clientId, PacketType::LOBBY_UPDATE, &update, static_cast<uint32_t>(sizeof(update)));
         }
     }
 }

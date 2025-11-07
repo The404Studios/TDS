@@ -61,7 +61,7 @@ void UIButton::update(float deltaTime) {
 
     // Hover animation
     if (animated && hovered) {
-        float pulse = 0.9f + 0.1f * std::sin(animTime * 3.0f);
+        float pulse = 0.9f + 0.1f * std::sinf(animTime * 3.0f);
         Color animColor = hoverColor;
         animColor.r *= pulse;
         animColor.g *= pulse;

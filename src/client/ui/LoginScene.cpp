@@ -197,8 +197,8 @@ void LoginScene::attemptLogin() {
     statusText->setText(statusMessage);
 
     LoginRequest req;
-    strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
-    strncpy_s(req.password, password.c_str(), sizeof(req.password) - 1);
+    strncpy_s(req.username, sizeof(req.username), username.c_str(), sizeof(req.username) - 1);
+    strncpy_s(req.passwordHash, sizeof(req.passwordHash), password.c_str(), sizeof(req.passwordHash) - 1);
     networkClient->sendPacket(PacketType::LOGIN_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
 }
 
@@ -220,38 +220,39 @@ void LoginScene::attemptRegister() {
     statusText->setText(statusMessage);
 
     RegisterRequest req;
-    strncpy_s(req.username, username.c_str(), sizeof(req.username) - 1);
-    strncpy_s(req.password, password.c_str(), sizeof(req.password) - 1);
-    strncpy_s(req.email, email.c_str(), sizeof(req.email) - 1);
+    strncpy_s(req.username, sizeof(req.username), username.c_str(), sizeof(req.username) - 1);
+    strncpy_s(req.passwordHash, sizeof(req.passwordHash), password.c_str(), sizeof(req.passwordHash) - 1);
+    strncpy_s(req.email, sizeof(req.email), email.c_str(), sizeof(req.email) - 1);
     networkClient->sendPacket(PacketType::REGISTER_REQUEST, &req, static_cast<uint32_t>(sizeof(req)));
 }
 
 void LoginScene::processNetworkPackets() {
-    Packet packet;
-    while (networkClient->receivePacket(&packet)) {
+    while (networkClient->hasPackets()) {
+        NetworkClient::ReceivedPacket packet = networkClient->getNextPacket();
+
         if (packet.type == PacketType::LOGIN_RESPONSE) {
-            LoginResponse* resp = (LoginResponse*)packet.data;
+            LoginResponse* resp = (LoginResponse*)packet.payload.data();
             waitingForResponse = false;
             if (resp->success) {
                 accountId = resp->accountId;
                 statusMessage = "Login successful!";
                 // Scene transition will be handled by main application
             } else {
-                errorMessage = resp->message;
+                errorMessage = resp->errorMessage;
                 errorText->setText(errorMessage);
                 statusMessage.clear();
                 statusText->setText("");
             }
         }
         else if (packet.type == PacketType::REGISTER_RESPONSE) {
-            RegisterResponse* resp = (RegisterResponse*)packet.data;
+            RegisterResponse* resp = (RegisterResponse*)packet.payload.data();
             waitingForResponse = false;
             if (resp->success) {
                 statusMessage = "Registration successful! Please login.";
                 statusText->setText(statusMessage);
                 switchMode(Mode::LOGIN);
             } else {
-                errorMessage = resp->message;
+                errorMessage = resp->errorMessage;
                 errorText->setText(errorMessage);
             }
         }
@@ -262,7 +263,7 @@ void LoginScene::update(float deltaTime) {
     animTime += deltaTime;
 
     // Animate title
-    float pulse = 0.85f + 0.15f * std::sin(animTime * 2.0f);
+    float pulse = 0.85f + 0.15f * std::sinf(animTime * 2.0f);
     titleText->setColor(Color(pulse, pulse * 0.8f, pulse * 0.4f, 1.0f));
 
     // Animate status dots

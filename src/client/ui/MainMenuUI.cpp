@@ -28,7 +28,7 @@ void MainMenuUI::render() {
     glLoadIdentity();
 
     // Animated title
-    float pulse = 0.85f + 0.15f * std::sin(animTime * 2.0f);
+    float pulse = 0.85f + 0.15f * std::sinf(animTime * 2.0f);
     glColor3f(pulse, pulse * 0.85f, pulse * 0.5f);
     TextRenderer::drawTextCentered("EXTRACTION SHOOTER", 0.8f, 2.2f);
 
@@ -125,7 +125,7 @@ void MainMenuUI::render() {
 
         // Button background
         if (isHover) {
-            float hoverPulse = 0.3f + 0.1f * std::sin(animTime * 6.0f);
+            float hoverPulse = 0.3f + 0.1f * std::sinf(animTime * 6.0f);
             glColor4f(0.25f + hoverPulse, 0.45f + hoverPulse, 0.75f + hoverPulse, 0.95f);
         } else if (btn.index == selectedOption) {
             glColor4f(0.22f, 0.4f, 0.65f, 0.95f);
@@ -136,7 +136,7 @@ void MainMenuUI::render() {
 
         // Button border
         if (isHover) {
-            float glowPulse = 0.6f + 0.4f * std::sin(animTime * 8.0f);
+            float glowPulse = 0.6f + 0.4f * std::sinf(animTime * 8.0f);
             glColor3f(glowPulse, glowPulse * 0.85f, 1.0f);
             glLineWidth(3.0f);
         } else {

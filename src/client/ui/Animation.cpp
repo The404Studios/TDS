@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846f
 #endif
 
 // ===== Easing Functions =====
@@ -75,41 +75,41 @@ float Easing::easeInOutQuart(float t) {
 }
 
 float Easing::easeInSine(float t) {
-    return 1.0f - std::cos(t * M_PI / 2.0f);
+    return 1.0f - std::cosf(t * M_PI / 2.0f);
 }
 float Easing::easeOutSine(float t) {
-    return std::sin(t * M_PI / 2.0f);
+    return std::sinf(t * M_PI / 2.0f);
 }
 float Easing::easeInOutSine(float t) {
-    return -(std::cos(M_PI * t) - 1.0f) / 2.0f;
+    return -(std::cosf(M_PI * t) - 1.0f) / 2.0f;
 }
 
 float Easing::easeInExpo(float t) {
-    return t == 0.0f ? 0.0f : std::pow(2.0f, 10.0f * (t - 1.0f));
+    return t == 0.0f ? 0.0f : std::powf(2.0f, 10.0f * (t - 1.0f));
 }
 float Easing::easeOutExpo(float t) {
-    return t == 1.0f ? 1.0f : 1.0f - std::pow(2.0f, -10.0f * t);
+    return t == 1.0f ? 1.0f : 1.0f - std::powf(2.0f, -10.0f * t);
 }
 float Easing::easeInOutExpo(float t) {
     if (t == 0.0f || t == 1.0f) return t;
     if (t < 0.5f) {
-        return std::pow(2.0f, 20.0f * t - 10.0f) / 2.0f;
+        return std::powf(2.0f, 20.0f * t - 10.0f) / 2.0f;
     } else {
-        return (2.0f - std::pow(2.0f, -20.0f * t + 10.0f)) / 2.0f;
+        return (2.0f - std::powf(2.0f, -20.0f * t + 10.0f)) / 2.0f;
     }
 }
 
 float Easing::easeInCirc(float t) {
-    return 1.0f - std::sqrt(1.0f - t * t);
+    return 1.0f - std::sqrtf(1.0f - t * t);
 }
 float Easing::easeOutCirc(float t) {
-    return std::sqrt(1.0f - (t - 1.0f) * (t - 1.0f));
+    return std::sqrtf(1.0f - (t - 1.0f) * (t - 1.0f));
 }
 float Easing::easeInOutCirc(float t) {
     if (t < 0.5f) {
-        return (1.0f - std::sqrt(1.0f - 4.0f * t * t)) / 2.0f;
+        return (1.0f - std::sqrtf(1.0f - 4.0f * t * t)) / 2.0f;
     } else {
-        return (std::sqrt(1.0f - (-2.0f * t + 2.0f) * (-2.0f * t + 2.0f)) + 1.0f) / 2.0f;
+        return (std::sqrtf(1.0f - (-2.0f * t + 2.0f) * (-2.0f * t + 2.0f)) + 1.0f) / 2.0f;
     }
 }
 
@@ -121,35 +121,35 @@ float Easing::easeInBack(float t) {
 float Easing::easeOutBack(float t) {
     const float c1 = 1.70158f;
     const float c3 = c1 + 1.0f;
-    return 1.0f + c3 * std::pow(t - 1.0f, 3.0f) + c1 * std::pow(t - 1.0f, 2.0f);
+    return 1.0f + c3 * std::powf(t - 1.0f, 3.0f) + c1 * std::powf(t - 1.0f, 2.0f);
 }
 float Easing::easeInOutBack(float t) {
     const float c1 = 1.70158f;
     const float c2 = c1 * 1.525f;
     if (t < 0.5f) {
-        return (std::pow(2.0f * t, 2.0f) * ((c2 + 1.0f) * 2.0f * t - c2)) / 2.0f;
+        return (std::powf(2.0f * t, 2.0f) * ((c2 + 1.0f) * 2.0f * t - c2)) / 2.0f;
     } else {
-        return (std::pow(2.0f * t - 2.0f, 2.0f) * ((c2 + 1.0f) * (t * 2.0f - 2.0f) + c2) + 2.0f) / 2.0f;
+        return (std::powf(2.0f * t - 2.0f, 2.0f) * ((c2 + 1.0f) * (t * 2.0f - 2.0f) + c2) + 2.0f) / 2.0f;
     }
 }
 
 float Easing::easeInElastic(float t) {
     const float c4 = (2.0f * M_PI) / 3.0f;
     if (t == 0.0f || t == 1.0f) return t;
-    return -std::pow(2.0f, 10.0f * t - 10.0f) * std::sin((t * 10.0f - 10.75f) * c4);
+    return -std::powf(2.0f, 10.0f * t - 10.0f) * std::sinf((t * 10.0f - 10.75f) * c4);
 }
 float Easing::easeOutElastic(float t) {
     const float c4 = (2.0f * M_PI) / 3.0f;
     if (t == 0.0f || t == 1.0f) return t;
-    return std::pow(2.0f, -10.0f * t) * std::sin((t * 10.0f - 0.75f) * c4) + 1.0f;
+    return std::powf(2.0f, -10.0f * t) * std::sinf((t * 10.0f - 0.75f) * c4) + 1.0f;
 }
 float Easing::easeInOutElastic(float t) {
     const float c5 = (2.0f * M_PI) / 4.5f;
     if (t == 0.0f || t == 1.0f) return t;
     if (t < 0.5f) {
-        return -(std::pow(2.0f, 20.0f * t - 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f;
+        return -(std::powf(2.0f, 20.0f * t - 10.0f) * std::sinf((20.0f * t - 11.125f) * c5)) / 2.0f;
     } else {
-        return (std::pow(2.0f, -20.0f * t + 10.0f) * std::sin((20.0f * t - 11.125f) * c5)) / 2.0f + 1.0f;
+        return (std::powf(2.0f, -20.0f * t + 10.0f) * std::sinf((20.0f * t - 11.125f) * c5)) / 2.0f + 1.0f;
     }
 }
 
