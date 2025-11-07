@@ -202,6 +202,39 @@
     <ClInclude Include="src\client\ui\Animation.h" />
     <ClInclude Include="src\client\ui\EventSystem.h" />
   </ItemGroup>
+  <!-- Header Files - Engine Core -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\core\Platform.h" />
+    <ClInclude Include="src\engine\GameEngine.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Rendering -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\rendering\RenderEngine.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Physics -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\physics\PhysicsEngine.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Particles -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\particles\ParticleSystem.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Weather -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\weather\WeatherSystem.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Network -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\network\NetworkEngine.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Resources -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\resources\ResourceManager.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Audio -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\audio\AudioEngine.h" />
+  </ItemGroup>
   <!-- Documentation -->
   <ItemGroup>
     <None Include="README.md" />
