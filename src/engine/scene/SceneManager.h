@@ -68,6 +68,23 @@ public:
      */
     void unloadAll();
 
+    /**
+     * Set transition delay between scene switches (in seconds)
+     * This creates a pause between unloading and loading scenes
+     * Default is 0.5 seconds for smooth transitions
+     */
+    void setTransitionDelay(float seconds) { transitionDelay = seconds; }
+
+    /**
+     * Get current transition delay
+     */
+    float getTransitionDelay() const { return transitionDelay; }
+
+    /**
+     * Check if currently transitioning between scenes
+     */
+    bool isTransitioning() const { return transitionTimer > 0.0f; }
+
 private:
     /**
      * Perform the actual scene switch
@@ -79,4 +96,6 @@ private:
     IScene* active;
     std::string pendingSwitch;
     float accumulator;
+    float transitionDelay;
+    float transitionTimer;
 };

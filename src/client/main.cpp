@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "network/NetworkClient.h"
-#include "ui/SceneManager.h"
+#include "ui/UISceneManager.h"
 #include "ui/LoginScene.h"
 #include "ui/MainMenuScene.h"
 #include "ui/UIText.h"
@@ -29,7 +29,7 @@ float g_mouseY = 0.0f;
 
 // Core systems
 std::unique_ptr<NetworkClient> g_networkClient;
-std::unique_ptr<SceneManager> g_sceneManager;
+std::unique_ptr<UISceneManager> g_sceneManager;
 
 // Scene references
 std::shared_ptr<LoginScene> g_loginScene;
@@ -206,7 +206,7 @@ void initializeScenes() {
     std::cout << "[Client] Initializing scene system..." << std::endl;
 
     // Create scene manager
-    g_sceneManager = std::make_unique<SceneManager>();
+    g_sceneManager = std::make_unique<UISceneManager>();
 
     // Create login scene
     g_loginScene = std::make_shared<LoginScene>(g_networkClient.get());

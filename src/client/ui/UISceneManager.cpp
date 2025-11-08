@@ -1,18 +1,18 @@
-#include "SceneManager.h"
+#include "UISceneManager.h"
 
-SceneManager::SceneManager()
+UISceneManager::UISceneManager()
     : currentScene(nullptr), threadPool(4), transitioning(false) {
 }
 
-SceneManager::~SceneManager() {
+UISceneManager::~UISceneManager() {
     unloadAllScenes();
 }
 
-void SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
+void UISceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
     scenes[name] = scene;
 }
 
-void SceneManager::unregisterScene(const std::string& name) {
+void UISceneManager::unregisterScene(const std::string& name) {
     auto it = scenes.find(name);
     if (it != scenes.end()) {
         if (it->second->isLoaded()) {
@@ -22,7 +22,7 @@ void SceneManager::unregisterScene(const std::string& name) {
     }
 }
 
-void SceneManager::loadScene(const std::string& name) {
+void UISceneManager::loadScene(const std::string& name) {
     auto it = scenes.find(name);
     if (it != scenes.end() && !it->second->isLoaded()) {
         it->second->onLoad();
@@ -30,7 +30,7 @@ void SceneManager::loadScene(const std::string& name) {
     }
 }
 
-void SceneManager::unloadScene(const std::string& name) {
+void UISceneManager::unloadScene(const std::string& name) {
     auto it = scenes.find(name);
     if (it != scenes.end() && it->second->isLoaded()) {
         it->second->onUnload();
@@ -40,7 +40,7 @@ void SceneManager::unloadScene(const std::string& name) {
     }
 }
 
-void SceneManager::unloadAllScenes() {
+void UISceneManager::unloadAllScenes() {
     for (auto& pair : scenes) {
         if (pair.second->isLoaded()) {
             pair.second->onUnload();
@@ -49,7 +49,7 @@ void SceneManager::unloadAllScenes() {
     currentScene = nullptr;
 }
 
-void SceneManager::loadSceneAsync(const std::string& name, std::function<void()> onComplete) {
+void UISceneManager::loadSceneAsync(const std::string& name, std::function<void()> onComplete) {
     threadPool.enqueue([this, name, onComplete]() {
         this->loadScene(name);
         if (onComplete) {
@@ -67,7 +67,7 @@ void SceneManager::unloadSceneAsync(const std::string& name, std::function<void(
     });
 }
 
-void SceneManager::transitionTo(const std::string& name, bool unloadCurrent) {
+void UISceneManager::transitionTo(const std::string& name, bool unloadCurrent) {
     if (transitioning) return;
 
     if (unloadCurrent && currentScene) {
@@ -78,7 +78,7 @@ void SceneManager::transitionTo(const std::string& name, bool unloadCurrent) {
     loadScene(name);
 }
 
-void SceneManager::transitionToAsync(const std::string& name, bool unloadCurrent, std::function<void()> onComplete) {
+void UISceneManager::transitionToAsync(const std::string& name, bool unloadCurrent, std::function<void()> onComplete) {
     if (transitioning) return;
     transitioning = true;
 
@@ -99,12 +99,12 @@ void SceneManager::transitionToAsync(const std::string& name, bool unloadCurrent
     });
 }
 
-std::shared_ptr<Scene> SceneManager::getScene(const std::string& name) {
+std::shared_ptr<Scene> UISceneManager::getScene(const std::string& name) {
     auto it = scenes.find(name);
     return (it != scenes.end()) ? it->second : nullptr;
 }
 
-void SceneManager::update(float deltaTime) {
+void UISceneManager::update(float deltaTime) {
     scheduler.update(deltaTime);
 
     if (currentScene && currentScene->isLoaded()) {
@@ -112,13 +112,13 @@ void SceneManager::update(float deltaTime) {
     }
 }
 
-void SceneManager::render() {
+void UISceneManager::render() {
     if (currentScene && currentScene->isLoaded()) {
         currentScene->render();
     }
 }
 
-bool SceneManager::isSceneLoaded(const std::string& name) const {
+bool UISceneManager::isSceneLoaded(const std::string& name) const {
     auto it = scenes.find(name);
     return (it != scenes.end() && it->second->isLoaded());
 }

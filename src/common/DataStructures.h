@@ -87,7 +87,8 @@ struct Item {
     int storageWidth;          // For backpacks/containers
     int storageHeight;
 
-    Item() : instanceId(0), width(1), height(1), stackSize(1), maxStack(1),
+    Item() : instanceId(0), type(ItemType::WEAPON), rarity(ItemRarity::COMMON),
+             width(1), height(1), stackSize(1), maxStack(1),
              value(0), foundInRaid(false), damage(0), magazineSize(0),
              currentAmmo(0), fireRate(600.0f), reloadTime(2.5f),
              armorClass(0), durability(0), maxDurability(0),

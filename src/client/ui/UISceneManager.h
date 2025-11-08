@@ -8,11 +8,11 @@
 #include <memory>
 #include <functional>
 
-// Scene Manager - Handles scene loading, unloading, and transitions
-class SceneManager {
+// UI Scene Manager - Handles UI scene loading, unloading, and transitions (deprecated - use engine::SceneManager instead)
+class UISceneManager {
 public:
-    SceneManager();
-    ~SceneManager();
+    UISceneManager();
+    ~UISceneManager();
 
     // Scene registration
     void registerScene(const std::string& name, std::shared_ptr<Scene> scene);

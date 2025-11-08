@@ -64,6 +64,15 @@ public:
         return items;
     }
 
+    // Get all items
+    std::vector<Item> getAllItems() const {
+        std::vector<Item> items;
+        for (const auto& pair : itemTemplates) {
+            items.push_back(pair.second);
+        }
+        return items;
+    }
+
     // Get item name by type (for displaying generic type names)
     static const char* getItemName(ItemType type) {
         switch (type) {
