@@ -14,33 +14,26 @@ StashScene::StashScene()
       gridPadding(2.0f) {
 }
 
-void StashScene::onEnter() {
+bool StashScene::onEnter() {
     std::cout << "[StashScene] Entering stash management" << std::endl;
 
     initializeInventory();
     initializeUI();
     updateGridCells();
     updateStatsText();
+
+    return true;
 }
 
 void StashScene::onExit() {
     std::cout << "[StashScene] Exiting stash" << std::endl;
 }
 
-void StashScene::onPause() {
-    // Save inventory state
-}
-
-void StashScene::onResume() {
-    updateGridCells();
-    updateStatsText();
-}
-
-void StashScene::tick(float dt) {
+void StashScene::update(float dt) {
     // Update UI animations if any
 }
 
-void StashScene::fixedTick(float fixedDt) {
+void StashScene::fixedUpdate(float fixedDt) {
     // No physics in stash scene
 }
 

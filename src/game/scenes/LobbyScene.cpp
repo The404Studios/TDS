@@ -10,12 +10,14 @@ LobbyScene::LobbyScene()
       partySize(1) {
 }
 
-void LobbyScene::onEnter() {
+bool LobbyScene::onEnter() {
     std::cout << "[LobbyScene] Entering lobby" << std::endl;
 
     initializeSystems();
     initializeUI();
     switchTab(Tab::PARTY);
+
+    return true;
 }
 
 void LobbyScene::onExit() {
@@ -27,16 +29,7 @@ void LobbyScene::onExit() {
     }
 }
 
-void LobbyScene::onPause() {
-}
-
-void LobbyScene::onResume() {
-    updatePartyUI();
-    updateFriendsUI();
-    updateRequestsUI();
-}
-
-void LobbyScene::tick(float dt) {
+void LobbyScene::update(float dt) {
     if (isMatchmaking) {
         matchmakingTime += dt;
 
@@ -52,7 +45,7 @@ void LobbyScene::tick(float dt) {
     }
 }
 
-void LobbyScene::fixedTick(float fixedDt) {
+void LobbyScene::fixedUpdate(float fixedDt) {
 }
 
 void LobbyScene::handleInput(const InputState& input) {

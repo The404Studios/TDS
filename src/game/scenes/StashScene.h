@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../engine/scene/Scene.h"
+#include "../../engine/scene/IScene.h"
 #include "../../client/ui/GameObject.h"
 #include "../../client/ui/UIButton.h"
 #include "../../client/ui/Text.h"
@@ -12,26 +12,21 @@
  * StashScene - Persistent inventory management screen
  * Like Tarkov's stash where you organize loot between raids
  */
-class StashScene : public Scene {
+class StashScene : public IScene {
 public:
     StashScene();
     ~StashScene() override = default;
 
-    // Scene lifecycle
-    void onEnter() override;
+    // IScene interface
+    std::string name() const override { return "Stash"; }
+    bool onEnter() override;
     void onExit() override;
-    void onPause() override;
-    void onResume() override;
-
-    // Update
-    void tick(float dt) override;
-    void fixedTick(float fixedDt) override;
-
-    // Input
-    void handleInput(const InputState& input) override;
-
-    // Rendering
+    void fixedUpdate(float dt) override;
+    void update(float dt) override;
     void render() override;
+
+    // Custom input handling
+    void handleInput(const InputState& input);
 
 private:
     // Inventory system

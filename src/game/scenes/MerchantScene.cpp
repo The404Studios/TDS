@@ -14,7 +14,7 @@ MerchantScene::MerchantScene()
       maxVisibleItems(10) {
 }
 
-void MerchantScene::onEnter() {
+bool MerchantScene::onEnter() {
     std::cout << "[MerchantScene] Entering merchant trading" << std::endl;
 
     initializeMerchants();
@@ -22,26 +22,19 @@ void MerchantScene::onEnter() {
     initializeUI();
     switchMerchant(currentMerchantId);
     updateMoneyDisplay();
+
+    return true;
 }
 
 void MerchantScene::onExit() {
     std::cout << "[MerchantScene] Exiting merchant" << std::endl;
 }
 
-void MerchantScene::onPause() {
-    // Save transaction state if needed
-}
-
-void MerchantScene::onResume() {
-    updateItemList();
-    updateMoneyDisplay();
-}
-
-void MerchantScene::tick(float dt) {
+void MerchantScene::update(float dt) {
     // Update UI animations if any
 }
 
-void MerchantScene::fixedTick(float fixedDt) {
+void MerchantScene::fixedUpdate(float fixedDt) {
     // No physics in merchant scene
 }
 
