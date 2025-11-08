@@ -169,6 +169,11 @@
     <ClCompile Include="src\client\ui\UIInputField.cpp" />
     <ClCompile Include="src\client\ui\Animation.cpp" />
     <ClCompile Include="src\client\ui\EventSystem.cpp" />
+    <!-- New Engine Scene System -->
+    <ClCompile Include="src\engine\scene\SceneManager.cpp" />
+    <!-- Game Scenes -->
+    <ClCompile Include="src\game\scenes\MenuScene.cpp" />
+    <ClCompile Include="src\game\scenes\RaidScene.cpp" />
   </ItemGroup>
   <!-- Header Files - Common -->
   <ItemGroup>
@@ -206,6 +211,18 @@
   <ItemGroup>
     <ClInclude Include="src\engine\core\Platform.h" />
     <ClInclude Include="src\engine\GameEngine.h" />
+  </ItemGroup>
+  <!-- Header Files - Engine Scene System -->
+  <ItemGroup>
+    <ClInclude Include="src\engine\scene\IScene.h" />
+    <ClInclude Include="src\engine\scene\SceneManager.h" />
+    <ClInclude Include="src\engine\scene\Entity.h" />
+    <ClInclude Include="src\engine\scene\Prefab.h" />
+  </ItemGroup>
+  <!-- Header Files - Game Scenes -->
+  <ItemGroup>
+    <ClInclude Include="src\game\scenes\MenuScene.h" />
+    <ClInclude Include="src\game\scenes\RaidScene.h" />
   </ItemGroup>
   <!-- Header Files - Engine Rendering -->
   <ItemGroup>
