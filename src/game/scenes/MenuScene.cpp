@@ -117,32 +117,28 @@ void MenuScene::setupUI() {
     titleText->getTransform().y = 0.6f;
 
     // Play button
-    playButton = std::make_shared<UIButton>("PlayButton");
-    playButton->setText("FIND MATCH");
+    playButton = std::make_shared<UIButton>("PlayButton", "FIND MATCH");
     playButton->setSize(0.4f, 0.1f);
     playButton->getTransform().x = -0.2f;
     playButton->getTransform().y = 0.2f;
     playButton->setOnClick([this]() { onPlayClicked(); });
 
     // Stash button
-    stashButton = std::make_shared<UIButton>("StashButton");
-    stashButton->setText("STASH");
+    stashButton = std::make_shared<UIButton>("StashButton", "STASH");
     stashButton->setSize(0.4f, 0.1f);
     stashButton->getTransform().x = -0.2f;
     stashButton->getTransform().y = 0.05f;
     stashButton->setOnClick([this]() { onStashClicked(); });
 
     // Settings button
-    settingsButton = std::make_shared<UIButton>("SettingsButton");
-    settingsButton->setText("SETTINGS");
+    settingsButton = std::make_shared<UIButton>("SettingsButton", "SETTINGS");
     settingsButton->setSize(0.4f, 0.1f);
     settingsButton->getTransform().x = -0.2f;
     settingsButton->getTransform().y = -0.1f;
     settingsButton->setOnClick([this]() { onSettingsClicked(); });
 
     // Quit button
-    quitButton = std::make_shared<UIButton>("QuitButton");
-    quitButton->setText("QUIT");
+    quitButton = std::make_shared<UIButton>("QuitButton", "QUIT");
     quitButton->setSize(0.4f, 0.1f);
     quitButton->getTransform().x = -0.2f;
     quitButton->getTransform().y = -0.25f;

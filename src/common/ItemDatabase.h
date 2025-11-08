@@ -33,6 +33,11 @@ public:
         return Item();  // Return default item if not found
     }
 
+    // Get all items
+    const std::map<std::string, Item>& getAllItems() const {
+        return itemTemplates;
+    }
+
     // Get all item IDs
     std::vector<std::string> getAllItemIds() const {
         std::vector<std::string> ids;

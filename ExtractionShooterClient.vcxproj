@@ -156,7 +156,9 @@
     <!-- New Scene System -->
     <ClCompile Include="src\client\ui\GameObject.cpp" />
     <ClCompile Include="src\client\ui\Scene.cpp" />
-    <ClCompile Include="src\client\ui\SceneManager.cpp" />
+    <ClCompile Include="src\client\ui\SceneManager.cpp">
+      <ObjectFileName>$(IntDir)client_ui\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\client\ui\ThreadPool.cpp" />
     <ClCompile Include="src\client\ui\Scheduler.cpp" />
     <ClCompile Include="src\client\ui\UIElement.cpp" />
@@ -170,7 +172,9 @@
     <ClCompile Include="src\client\ui\Animation.cpp" />
     <ClCompile Include="src\client\ui\EventSystem.cpp" />
     <!-- New Engine Scene System -->
-    <ClCompile Include="src\engine\scene\SceneManager.cpp" />
+    <ClCompile Include="src\engine\scene\SceneManager.cpp">
+      <ObjectFileName>$(IntDir)engine_scene\</ObjectFileName>
+    </ClCompile>
     <!-- Game Scenes -->
     <ClCompile Include="src\game\scenes\MenuScene.cpp" />
     <ClCompile Include="src\game\scenes\RaidScene.cpp" />

@@ -28,8 +28,8 @@ public:
     void unloadSceneAsync(const std::string& name, std::function<void()> onComplete = nullptr);
 
     // Scene transitions
-    void transitionTo(const std::string& name, bool unloadCurrent = true);
-    void transitionToAsync(const std::string& name, bool unloadCurrent = true, std::function<void()> onComplete = nullptr);
+    void transitionTo(const std::string& name, bool unloadCurrent = true, float delay = 0.5f);
+    void transitionToAsync(const std::string& name, bool unloadCurrent = true, float delay = 0.5f, std::function<void()> onComplete = nullptr);
 
     // Current scene
     std::shared_ptr<Scene> getCurrentScene() const { return currentScene; }

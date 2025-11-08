@@ -41,14 +41,20 @@ public:
      * Request a scene switch
      * Actual switch happens at the start of the next tick() call
      * @param key Scene identifier
+     * @param transitionDelay Delay in seconds before loading the new scene (default: 0.5s)
      * @return true if scene exists, false otherwise
      */
-    bool switchTo(const std::string& key);
+    bool switchTo(const std::string& key, float transitionDelay = 0.5f);
 
     /**
      * Check if a scene is currently active
      */
     bool hasActive() const { return active != nullptr; }
+
+    /**
+     * Check if a scene transition is in progress
+     */
+    bool isTransitioning() const { return transitioning; }
 
     /**
      * Get the currently active scene
@@ -79,4 +85,9 @@ private:
     IScene* active;
     std::string pendingSwitch;
     float accumulator;
+
+    // Transition state
+    bool transitioning;
+    float transitionTimer;
+    float transitionDelay;
 };

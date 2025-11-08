@@ -1,4 +1,6 @@
 #include "SceneManager.h"
+#include <thread>
+#include <chrono>
 
 SceneManager::SceneManager()
     : currentScene(nullptr), threadPool(4), transitioning(false) {
@@ -41,9 +43,9 @@ void SceneManager::unloadScene(const std::string& name) {
 }
 
 void SceneManager::unloadAllScenes() {
-    for (auto& pair : scenes) {
-        if (pair.second->isLoaded()) {
-            pair.second->onUnload();
+    for (std::pair<const std::string, std::shared_ptr<Scene>>& scenePair : scenes) {
+        if (scenePair.second->isLoaded()) {
+            scenePair.second->onUnload();
         }
     }
     currentScene = nullptr;
@@ -67,7 +69,7 @@ void SceneManager::unloadSceneAsync(const std::string& name, std::function<void(
     });
 }
 
-void SceneManager::transitionTo(const std::string& name, bool unloadCurrent) {
+void SceneManager::transitionTo(const std::string& name, bool unloadCurrent, float delay) {
     if (transitioning) return;
 
     if (unloadCurrent && currentScene) {
@@ -75,19 +77,33 @@ void SceneManager::transitionTo(const std::string& name, bool unloadCurrent) {
         currentScene = nullptr;
     }
 
-    loadScene(name);
+    // Add delay before loading new scene
+    if (delay > 0.0f) {
+        scheduler.scheduleTask([this, name]() {
+            this->loadScene(name);
+        }, delay);
+    } else {
+        loadScene(name);
+    }
 }
 
-void SceneManager::transitionToAsync(const std::string& name, bool unloadCurrent, std::function<void()> onComplete) {
+void SceneManager::transitionToAsync(const std::string& name, bool unloadCurrent, float delay, std::function<void()> onComplete) {
     if (transitioning) return;
     transitioning = true;
 
     std::string currentName = currentScene ? currentScene->getName() : "";
 
-    threadPool.enqueue([this, name, currentName, unloadCurrent, onComplete]() {
+    threadPool.enqueue([this, name, currentName, unloadCurrent, delay, onComplete]() {
         if (unloadCurrent && !currentName.empty()) {
             this->unloadScene(currentName);
         }
+
+        // Add delay before loading new scene
+        if (delay > 0.0f) {
+            // Sleep in the thread pool thread
+            std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(delay * 1000)));
+        }
+
         this->loadScene(name);
 
         scheduler.scheduleNextFrame([this, onComplete]() {

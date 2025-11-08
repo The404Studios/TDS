@@ -2,28 +2,48 @@
 #include <iostream>
 
 SceneManager::SceneManager()
-    : active(nullptr), accumulator(0.0f) {
+    : active(nullptr), accumulator(0.0f), transitioning(false), transitionTimer(0.0f), transitionDelay(0.5f) {
 }
 
 SceneManager::~SceneManager() {
     unloadAll();
 }
 
-bool SceneManager::switchTo(const std::string& key) {
+bool SceneManager::switchTo(const std::string& key, float delay) {
     if (scenes.find(key) == scenes.end()) {
         std::cerr << "[SceneManager] Scene '" << key << "' not found!" << std::endl;
         return false;
     }
 
-    std::cout << "[SceneManager] Scheduling switch to: " << key << std::endl;
+    std::cout << "[SceneManager] Scheduling switch to: " << key << " (delay: " << delay << "s)" << std::endl;
     pendingSwitch = key;
+    transitionDelay = delay;
+    transitioning = false;
+    transitionTimer = 0.0f;
     return true;
 }
 
 void SceneManager::tick(float dt, float fixedDt) {
-    // Handle pending scene switch at safe point (start of frame)
+    // Handle pending scene switch with transition delay
     if (!pendingSwitch.empty()) {
-        doSwitch();
+        if (!transitioning) {
+            // First phase: Exit current scene
+            if (active) {
+                std::cout << "[SceneManager] Exiting scene: " << active->name() << std::endl;
+                active->onExit();
+                active = nullptr;
+            }
+            transitioning = true;
+            transitionTimer = 0.0f;
+            std::cout << "[SceneManager] Transition pause started (" << transitionDelay << "s)" << std::endl;
+        } else {
+            // Wait during transition
+            transitionTimer += dt;
+            if (transitionTimer >= transitionDelay) {
+                // Second phase: Enter new scene
+                doSwitch();
+            }
+        }
     }
 
     if (!active) {
@@ -45,18 +65,11 @@ void SceneManager::tick(float dt, float fixedDt) {
 }
 
 void SceneManager::doSwitch() {
-    // Exit current scene
-    if (active) {
-        std::cout << "[SceneManager] Exiting scene: " << active->name() << std::endl;
-        active->onExit();
-        active = nullptr;
-    }
-
-    // Enter new scene
+    // Enter new scene (exit already happened during transition)
     auto it = scenes.find(pendingSwitch);
     if (it != scenes.end()) {
         active = it->second.get();
-        std::cout << "[SceneManager] Entering scene: " << active->name() << std::endl;
+        std::cout << "[SceneManager] Transition complete. Entering scene: " << active->name() << std::endl;
 
         if (!active->onEnter()) {
             std::cerr << "[SceneManager] Scene failed to initialize!" << std::endl;
@@ -65,6 +78,8 @@ void SceneManager::doSwitch() {
     }
 
     pendingSwitch.clear();
+    transitioning = false;
+    transitionTimer = 0.0f;
     accumulator = 0.0f;  // Reset accumulator on scene switch
 }
 
