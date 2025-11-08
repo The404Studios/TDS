@@ -155,13 +155,13 @@ private:
 // Transform animation (for GameObject)
 class TransformAnimation : public Animation {
 public:
-    TransformAnimation(Transform* transform, AnimationTarget target,
+    TransformAnimation(UITransform* transform, AnimationTarget target,
                       float from, float to, float duration, EasingType easing = EasingType::LINEAR);
 
     void apply() override;
 
 private:
-    Transform* transform;
+    UITransform* transform;
     AnimationTarget animTarget;
     float fromValue;
     float toValue;

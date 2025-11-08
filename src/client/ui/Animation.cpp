@@ -250,7 +250,7 @@ void FloatAnimation::apply() {
 
 // ===== Transform Animation =====
 
-TransformAnimation::TransformAnimation(Transform* transform, AnimationTarget target,
+TransformAnimation::TransformAnimation(UITransform* transform, AnimationTarget target,
                                      float from, float to, float duration, EasingType easing)
     : Animation(duration, easing), transform(transform), animTarget(target),
       fromValue(from), toValue(to) {
