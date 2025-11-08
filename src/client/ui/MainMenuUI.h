@@ -1,0 +1,31 @@
+#pragma once
+#include "UIManager.h"
+#include "../network/NetworkClient.h"
+#include "../../common/NetworkProtocol.h"
+#include "../../common/DataStructures.h"
+
+// Main Menu UI - Access to stash, merchants, and lobby
+class MainMenuUI : public BaseUI {
+public:
+    MainMenuUI(NetworkClient* netClient, uint64_t accId)
+        : networkClient(netClient), accountId(accId), selectedOption(0), animTime(0.0f) {}
+
+    void update(float deltaTime) override;
+    void render() override;
+    void handleInput(char key) override;
+    void handleMouseClick(float x, float y) override;
+
+    void setPlayerStats(const PlayerStats& stats) {
+        playerStats = stats;
+    }
+
+private:
+    NetworkClient* networkClient;
+    uint64_t accountId;
+    int selectedOption;
+    PlayerStats playerStats;
+    float animTime;
+
+    void selectOption();
+    void handlePlayerDataResponse(const std::vector<uint8_t>& payload);
+};
