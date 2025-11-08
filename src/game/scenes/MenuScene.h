@@ -40,6 +40,7 @@ public:
 
 private:
     void setupUI();
+    void onLobbyClicked();
     void onPlayClicked();
     void onStashClicked();
     void onMerchantClicked();
@@ -53,6 +54,7 @@ private:
     // UI Elements
     std::shared_ptr<UIPanel> backgroundPanel;
     std::shared_ptr<UIText> titleText;
+    std::shared_ptr<UIButton> lobbyButton;
     std::shared_ptr<UIButton> playButton;
     std::shared_ptr<UIButton> stashButton;
     std::shared_ptr<UIButton> merchantButton;

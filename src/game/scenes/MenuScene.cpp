@@ -47,6 +47,7 @@ void MenuScene::onExit() {
     // Cleanup UI
     backgroundPanel.reset();
     titleText.reset();
+    lobbyButton.reset();
     playButton.reset();
     stashButton.reset();
     merchantButton.reset();
@@ -78,6 +79,7 @@ void MenuScene::update(float dt) {
     }
 
     // Update UI hover states
+    lobbyButton->update(dt);
     playButton->update(dt);
     stashButton->update(dt);
     merchantButton->update(dt);
@@ -93,6 +95,7 @@ void MenuScene::render() {
     // Render UI
     if (backgroundPanel) backgroundPanel->render();
     if (titleText) titleText->render();
+    if (lobbyButton) lobbyButton->render();
     if (playButton) playButton->render();
     if (stashButton) stashButton->render();
     if (merchantButton) merchantButton->render();
@@ -119,8 +122,15 @@ void MenuScene::setupUI() {
     titleText->getTransform().x = -0.4f;
     titleText->getTransform().y = 0.6f;
 
-    // Play button
-    playButton = std::make_shared<UIButton>("PlayButton", "FIND MATCH");
+    // Lobby button (party matchmaking)
+    lobbyButton = std::make_shared<UIButton>("LobbyButton", "LOBBY (PARTY)");
+    lobbyButton->setSize(0.4f, 0.1f);
+    lobbyButton->getTransform().x = -0.2f;
+    lobbyButton->getTransform().y = 0.35f;
+    lobbyButton->setOnClick([this]() { onLobbyClicked(); });
+
+    // Play button (solo queue)
+    playButton = std::make_shared<UIButton>("PlayButton", "SOLO QUEUE");
     playButton->setSize(0.4f, 0.1f);
     playButton->getTransform().x = -0.2f;
     playButton->getTransform().y = 0.2f;
@@ -163,8 +173,13 @@ void MenuScene::setupUI() {
     statusText->getTransform().y = -0.5f;
 }
 
+void MenuScene::onLobbyClicked() {
+    std::cout << "[MenuScene] Lobby clicked - switching to lobby scene for party matchmaking" << std::endl;
+    ENGINE.getSceneManager()->switchTo("lobby");
+}
+
 void MenuScene::onPlayClicked() {
-    std::cout << "[MenuScene] Play clicked - starting matchmaking" << std::endl;
+    std::cout << "[MenuScene] Play clicked - starting solo matchmaking" << std::endl;
 
     if (!inMatchmaking) {
         // Start matchmaking
@@ -174,7 +189,7 @@ void MenuScene::onPlayClicked() {
 
         inMatchmaking = true;
         matchmakingTime = 0.0f;
-        statusText->setText("Searching for match...");
+        statusText->setText("Searching for 100-player match (solo)...");
     }
 }
 
@@ -225,7 +240,9 @@ void MenuScene::handleMouseClick(float x, float y) {
     mouseY = y;
 
     // Check button clicks
-    if (playButton && playButton->containsPoint(x, y)) {
+    if (lobbyButton && lobbyButton->containsPoint(x, y)) {
+        lobbyButton->onClick();
+    } else if (playButton && playButton->containsPoint(x, y)) {
         playButton->onClick();
     } else if (stashButton && stashButton->containsPoint(x, y)) {
         stashButton->onClick();
@@ -243,6 +260,9 @@ void MenuScene::handleMouseMove(float x, float y) {
     mouseY = y;
 
     // Update button hover states
+    if (lobbyButton) {
+        lobbyButton->setHovered(lobbyButton->containsPoint(x, y));
+    }
     if (playButton) {
         playButton->setHovered(playButton->containsPoint(x, y));
     }

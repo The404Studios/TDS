@@ -14,6 +14,7 @@
 #include "../engine/GameEngine.h"
 #include "../game/scenes/MenuScene.h"
 #include "../game/scenes/RaidScene.h"
+#include "../game/scenes/LobbyScene.h"
 #include "../game/scenes/StashScene.h"
 #include "../game/scenes/MerchantScene.h"
 
@@ -131,6 +132,10 @@ void handleSceneInput(char key) {
             menuScene->handleInput(key);
         } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
             raidScene->handleInput(key);
+        } else if (auto lobbyScene = dynamic_cast<LobbyScene*>(currentScene)) {
+            InputState input; // Create temporary input state for key
+            input.keys[key] = true;
+            lobbyScene->handleInput(input);
         } else if (auto stashScene = dynamic_cast<StashScene*>(currentScene)) {
             InputState input; // Create temporary input state for key
             input.keys[key] = true;
@@ -165,6 +170,15 @@ void handleSceneMouseClick(float x, float y) {
             menuScene->handleMouseClick(x, y);
         } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
             raidScene->handleMouseClick(x, y);
+        } else if (auto lobbyScene = dynamic_cast<LobbyScene*>(currentScene)) {
+            // Convert to screen coordinates for lobby scene
+            int screenX = (int)((x + g_aspectRatio / 2.0f) * g_windowWidth / g_aspectRatio);
+            int screenY = (int)((1.0f - y) * g_windowHeight / 2.0f);
+            InputState input;
+            input.mouseX = screenX;
+            input.mouseY = screenY;
+            input.mouseLeftPressed = true;
+            lobbyScene->handleInput(input);
         } else if (auto stashScene = dynamic_cast<StashScene*>(currentScene)) {
             // Convert to screen coordinates for stash scene
             int screenX = (int)((x + g_aspectRatio / 2.0f) * g_windowWidth / g_aspectRatio);
@@ -209,6 +223,8 @@ void handleSceneMouseMove(float x, float y) {
             menuScene->handleMouseMove(x, y);
         } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
             raidScene->handleMouseMove(x, y);
+        } else if (auto lobbyScene = dynamic_cast<LobbyScene*>(currentScene)) {
+            // Lobby scene handles mouse move in handleInput
         } else if (auto stashScene = dynamic_cast<StashScene*>(currentScene)) {
             // Stash scene handles mouse move in handleInput
         } else if (auto merchantScene = dynamic_cast<MerchantScene*>(currentScene)) {
@@ -291,10 +307,11 @@ void initializeScenes() {
     // Register game scenes with engine SceneManager
     ENGINE.getSceneManager()->registerScene<MenuScene>("menu", g_networkClient.get());
     ENGINE.getSceneManager()->registerScene<RaidScene>("raid", g_networkClient.get(), 0);
+    ENGINE.getSceneManager()->registerScene<LobbyScene>("lobby");
     ENGINE.getSceneManager()->registerScene<StashScene>("stash");
     ENGINE.getSceneManager()->registerScene<MerchantScene>("merchant");
 
-    std::cout << "[Client] Registered engine scenes: menu, raid, stash, merchant" << std::endl;
+    std::cout << "[Client] Registered engine scenes: menu, raid, lobby, stash, merchant" << std::endl;
 
     // Create UI scene manager for login/main menu
     g_sceneManager = std::make_unique<UISceneManager>();
