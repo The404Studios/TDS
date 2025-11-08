@@ -96,7 +96,14 @@ void RaidScene::update(float dt) {
     auto audio = ENGINE.getAudioEngine();
     if (audio) {
         audio->setListenerPosition(cameraPosition);
-        audio->setListenerOrientation(cameraRotation);
+        // Calculate forward and up vectors from camera rotation
+        Vec3 forward(
+            std::sinf(cameraRotation.y) * std::cosf(cameraRotation.x),
+            std::sinf(cameraRotation.x),
+            std::cosf(cameraRotation.y) * std::cosf(cameraRotation.x)
+        );
+        Vec3 up(0, 1, 0);  // World up
+        audio->getListener().setOrientation(forward, up);
     }
 
     // Update particles

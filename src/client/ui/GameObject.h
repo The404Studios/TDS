@@ -5,14 +5,14 @@
 #include <memory>
 #include <functional>
 
-// Transform component for position, rotation, scale
-struct Transform {
+// UI Transform component for position, rotation, scale (2D)
+struct UITransform {
     float x, y, z;
     float rotation;
     float scaleX, scaleY;
 
-    Transform() : x(0), y(0), z(0), rotation(0), scaleX(1), scaleY(1) {}
-    Transform(float px, float py) : x(px), y(py), z(0), rotation(0), scaleX(1), scaleY(1) {}
+    UITransform() : x(0), y(0), z(0), rotation(0), scaleX(1), scaleY(1) {}
+    UITransform(float px, float py) : x(px), y(py), z(0), rotation(0), scaleX(1), scaleY(1) {}
 };
 
 // Base GameObject class with hierarchy support
@@ -35,9 +35,9 @@ public:
     virtual void render();
 
     // Transform
-    Transform& getTransform() { return transform; }
-    const Transform& getTransform() const { return transform; }
-    Transform getWorldTransform() const;
+    UITransform& getTransform() { return transform; }
+    const UITransform& getTransform() const { return transform; }
+    UITransform getWorldTransform() const;
 
     // Properties
     void setActive(bool active) { this->active = active; }
@@ -58,7 +58,7 @@ protected:
     std::string name;
     std::string tag;
     bool active;
-    Transform transform;
+    UITransform transform;
     GameObject* parent;
     std::vector<std::shared_ptr<GameObject>> children;
 };

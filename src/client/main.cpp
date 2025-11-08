@@ -257,8 +257,8 @@ void initializeScenes() {
     }
 
     // Register game scenes with engine SceneManager
-    auto menuScene = ENGINE.getSceneManager()->registerScene<MenuScene>("menu", g_networkClient.get());
-    auto raidScene = ENGINE.getSceneManager()->registerScene<RaidScene>("raid", g_networkClient.get(), 0);
+    ENGINE.getSceneManager()->registerScene<MenuScene>("menu", g_networkClient.get());
+    ENGINE.getSceneManager()->registerScene<RaidScene>("raid", g_networkClient.get(), 0);
 
     std::cout << "[Client] Registered engine scenes: menu, raid" << std::endl;
 

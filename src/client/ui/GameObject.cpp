@@ -32,10 +32,10 @@ void GameObject::setParent(GameObject* newParent) {
     parent = newParent;
 }
 
-Transform GameObject::getWorldTransform() const {
-    Transform world = transform;
+UITransform GameObject::getWorldTransform() const {
+    UITransform world = transform;
     if (parent) {
-        Transform parentWorld = parent->getWorldTransform();
+        UITransform parentWorld = parent->getWorldTransform();
         world.x += parentWorld.x;
         world.y += parentWorld.y;
         world.z += parentWorld.z;

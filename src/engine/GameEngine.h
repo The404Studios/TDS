@@ -88,7 +88,7 @@ public:
     void setFullscreen(bool enabled);
 
 private:
-    GameEngine() = default;
+    GameEngine();
     ~GameEngine();
 
     // No copy
