@@ -42,6 +42,7 @@ private:
     void setupUI();
     void onPlayClicked();
     void onStashClicked();
+    void onMerchantClicked();
     void onSettingsClicked();
     void onQuitClicked();
 
@@ -54,6 +55,7 @@ private:
     std::shared_ptr<UIText> titleText;
     std::shared_ptr<UIButton> playButton;
     std::shared_ptr<UIButton> stashButton;
+    std::shared_ptr<UIButton> merchantButton;
     std::shared_ptr<UIButton> settingsButton;
     std::shared_ptr<UIButton> quitButton;
     std::shared_ptr<UIText> statusText;

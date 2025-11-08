@@ -49,6 +49,7 @@ void MenuScene::onExit() {
     titleText.reset();
     playButton.reset();
     stashButton.reset();
+    merchantButton.reset();
     settingsButton.reset();
     quitButton.reset();
     statusText.reset();
@@ -79,6 +80,7 @@ void MenuScene::update(float dt) {
     // Update UI hover states
     playButton->update(dt);
     stashButton->update(dt);
+    merchantButton->update(dt);
     settingsButton->update(dt);
     quitButton->update(dt);
 }
@@ -93,6 +95,7 @@ void MenuScene::render() {
     if (titleText) titleText->render();
     if (playButton) playButton->render();
     if (stashButton) stashButton->render();
+    if (merchantButton) merchantButton->render();
     if (settingsButton) settingsButton->render();
     if (quitButton) quitButton->render();
     if (statusText) statusText->render();
@@ -130,18 +133,25 @@ void MenuScene::setupUI() {
     stashButton->getTransform().y = 0.05f;
     stashButton->setOnClick([this]() { onStashClicked(); });
 
+    // Merchant button
+    merchantButton = std::make_shared<UIButton>("MerchantButton", "TRADERS");
+    merchantButton->setSize(0.4f, 0.1f);
+    merchantButton->getTransform().x = -0.2f;
+    merchantButton->getTransform().y = -0.1f;
+    merchantButton->setOnClick([this]() { onMerchantClicked(); });
+
     // Settings button
     settingsButton = std::make_shared<UIButton>("SettingsButton", "SETTINGS");
     settingsButton->setSize(0.4f, 0.1f);
     settingsButton->getTransform().x = -0.2f;
-    settingsButton->getTransform().y = -0.1f;
+    settingsButton->getTransform().y = -0.25f;
     settingsButton->setOnClick([this]() { onSettingsClicked(); });
 
     // Quit button
     quitButton = std::make_shared<UIButton>("QuitButton", "QUIT");
     quitButton->setSize(0.4f, 0.1f);
     quitButton->getTransform().x = -0.2f;
-    quitButton->getTransform().y = -0.25f;
+    quitButton->getTransform().y = -0.4f;
     quitButton->setOnClick([this]() { onQuitClicked(); });
 
     // Status text
@@ -169,9 +179,13 @@ void MenuScene::onPlayClicked() {
 }
 
 void MenuScene::onStashClicked() {
-    std::cout << "[MenuScene] Stash clicked" << std::endl;
-    // TODO: Switch to stash scene
-    statusText->setText("Stash not implemented yet");
+    std::cout << "[MenuScene] Stash clicked - switching to stash scene" << std::endl;
+    ENGINE.getSceneManager()->switchTo("stash");
+}
+
+void MenuScene::onMerchantClicked() {
+    std::cout << "[MenuScene] Merchant clicked - switching to merchant scene" << std::endl;
+    ENGINE.getSceneManager()->switchTo("merchant");
 }
 
 void MenuScene::onSettingsClicked() {
@@ -215,6 +229,8 @@ void MenuScene::handleMouseClick(float x, float y) {
         playButton->onClick();
     } else if (stashButton && stashButton->containsPoint(x, y)) {
         stashButton->onClick();
+    } else if (merchantButton && merchantButton->containsPoint(x, y)) {
+        merchantButton->onClick();
     } else if (settingsButton && settingsButton->containsPoint(x, y)) {
         settingsButton->onClick();
     } else if (quitButton && quitButton->containsPoint(x, y)) {
@@ -232,6 +248,9 @@ void MenuScene::handleMouseMove(float x, float y) {
     }
     if (stashButton) {
         stashButton->setHovered(stashButton->containsPoint(x, y));
+    }
+    if (merchantButton) {
+        merchantButton->setHovered(merchantButton->containsPoint(x, y));
     }
     if (settingsButton) {
         settingsButton->setHovered(settingsButton->containsPoint(x, y));
