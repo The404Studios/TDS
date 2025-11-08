@@ -1,5 +1,6 @@
 #include "LobbyScene.h"
 #include "../../engine/GameEngine.h"
+#include "../../engine/scene/SceneManager.h"
 #include <sstream>
 #include <iostream>
 

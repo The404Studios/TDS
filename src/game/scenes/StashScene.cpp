@@ -1,5 +1,6 @@
 #include "StashScene.h"
 #include "../../engine/GameEngine.h"
+#include "../../engine/scene/SceneManager.h"
 #include <sstream>
 #include <algorithm>
 #include <iostream>

@@ -1,5 +1,6 @@
 #include "MerchantScene.h"
 #include "../../engine/GameEngine.h"
+#include "../../engine/scene/SceneManager.h"
 #include "../../common/ItemDatabase.h"
 #include <sstream>
 #include <algorithm>
