@@ -3,7 +3,7 @@
 #include "../../engine/scene/IScene.h"
 #include "../../client/ui/GameObject.h"
 #include "../../client/ui/UIButton.h"
-#include "../../client/ui/Text.h"
+#include "../../client/ui/UIText.h"
 #include "../systems/InventorySystem.h"
 #include <memory>
 #include <vector>
@@ -33,8 +33,8 @@ private:
     std::unique_ptr<Inventory> inventory;
 
     // UI Elements
-    std::shared_ptr<Text> titleText;
-    std::shared_ptr<Text> statsText;  // Weight, value, slots used
+    std::shared_ptr<UIText> titleText;
+    std::shared_ptr<UIText> statsText;  // Weight, value, slots used
     std::shared_ptr<UIButton> backButton;
     std::shared_ptr<UIButton> sortButton;
     std::shared_ptr<UIButton> filterButton;

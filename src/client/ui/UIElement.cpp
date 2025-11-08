@@ -13,7 +13,7 @@ void UIElement::render() {
 }
 
 bool UIElement::containsPoint(float x, float y) const {
-    Transform worldTrans = getWorldTransform();
+    UITransform worldTrans = getWorldTransform();
     return (x >= worldTrans.x && x <= worldTrans.x + width &&
             y >= worldTrans.y && y <= worldTrans.y + height);
 }

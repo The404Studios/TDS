@@ -246,7 +246,7 @@ void UIInputField::render() {
 }
 
 void UIInputField::renderCursor() {
-    Transform worldTrans = getWorldTransform();
+    UITransform worldTrans = getWorldTransform();
     float x = worldTrans.x;
     float y = worldTrans.y;
 
@@ -270,7 +270,7 @@ void UIInputField::renderCursor() {
 void UIInputField::renderSelection() {
     if (!hasSelection()) return;
 
-    Transform worldTrans = getWorldTransform();
+    UITransform worldTrans = getWorldTransform();
     float x = worldTrans.x;
     float y = worldTrans.y;
 

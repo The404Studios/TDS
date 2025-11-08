@@ -10,7 +10,7 @@ UIPanel::UIPanel(const std::string& name)
 void UIPanel::render() {
     if (!visible || !active) return;
 
-    Transform worldTrans = getWorldTransform();
+    UITransform worldTrans = getWorldTransform();
     float x = worldTrans.x;
     float y = worldTrans.y;
     float w = width * worldTrans.scaleX;

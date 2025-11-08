@@ -3,7 +3,7 @@
 #include "../../engine/scene/IScene.h"
 #include "../../client/ui/GameObject.h"
 #include "../../client/ui/UIButton.h"
-#include "../../client/ui/Text.h"
+#include "../../client/ui/UIText.h"
 #include "../systems/FriendsSystem.h"
 #include "../systems/PartySystem.h"
 #include <memory>
@@ -43,8 +43,8 @@ private:
     Tab currentTab;
 
     // UI Elements
-    std::shared_ptr<Text> titleText;
-    std::shared_ptr<Text> statusText;
+    std::shared_ptr<UIText> titleText;
+    std::shared_ptr<UIText> statusText;
 
     // Tab buttons
     std::shared_ptr<UIButton> partyTabButton;
@@ -61,8 +61,8 @@ private:
     // Party member list
     struct PartyMemberUI {
         PartyMember* member;
-        std::shared_ptr<Text> nameText;
-        std::shared_ptr<Text> statusText;
+        std::shared_ptr<UIText> nameText;
+        std::shared_ptr<UIText> statusText;
         std::shared_ptr<UIButton> kickButton;
         std::shared_ptr<UIButton> promoteButton;
     };
@@ -71,8 +71,8 @@ private:
     // Friends list
     struct FriendUI {
         Friend* friendPtr;
-        std::shared_ptr<Text> nameText;
-        std::shared_ptr<Text> statusText;
+        std::shared_ptr<UIText> nameText;
+        std::shared_ptr<UIText> statusText;
         std::shared_ptr<UIButton> inviteButton;
         std::shared_ptr<UIButton> removeButton;
     };
@@ -81,7 +81,7 @@ private:
     // Friend request list
     struct FriendRequestUI {
         FriendRequest* request;
-        std::shared_ptr<Text> nameText;
+        std::shared_ptr<UIText> nameText;
         std::shared_ptr<UIButton> acceptButton;
         std::shared_ptr<UIButton> declineButton;
     };

@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <functional>
 
 // Resource types
 enum class ResourceType {

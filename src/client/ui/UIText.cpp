@@ -44,7 +44,7 @@ void UIText::renderText(const std::string& txt, float x, float y, float size) {
 void UIText::render() {
     if (!visible || !active || text.empty()) return;
 
-    Transform worldTrans = getWorldTransform();
+    UITransform worldTrans = getWorldTransform();
     float x = worldTrans.x;
     float y = worldTrans.y;
 

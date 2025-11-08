@@ -3,7 +3,7 @@
 #include "../../engine/scene/IScene.h"
 #include "../../client/ui/GameObject.h"
 #include "../../client/ui/UIButton.h"
-#include "../../client/ui/Text.h"
+#include "../../client/ui/UIText.h"
 #include "../systems/InventorySystem.h"
 #include <memory>
 #include <vector>
@@ -62,10 +62,10 @@ private:
     TradeMode tradeMode;
 
     // UI Elements
-    std::shared_ptr<Text> titleText;
-    std::shared_ptr<Text> merchantNameText;
-    std::shared_ptr<Text> merchantLoyaltyText;
-    std::shared_ptr<Text> playerMoneyText;
+    std::shared_ptr<UIText> titleText;
+    std::shared_ptr<UIText> merchantNameText;
+    std::shared_ptr<UIText> merchantLoyaltyText;
+    std::shared_ptr<UIText> playerMoneyText;
     std::shared_ptr<UIButton> backButton;
     std::shared_ptr<UIButton> buyModeButton;
     std::shared_ptr<UIButton> sellModeButton;
@@ -90,7 +90,7 @@ private:
         int totalPrice;
     };
     std::vector<TradeItem> tradeCart;
-    std::shared_ptr<Text> cartText;
+    std::shared_ptr<UIText> cartText;
 
     // Filtering
     enum class ItemFilter {

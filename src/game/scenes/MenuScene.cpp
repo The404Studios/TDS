@@ -1,5 +1,6 @@
 #include "MenuScene.h"
 #include "../../engine/GameEngine.h"
+#include "../../engine/scene/SceneManager.h"
 #include "../../common/NetworkProtocol.h"
 #include <iostream>
 #include <cmath>
