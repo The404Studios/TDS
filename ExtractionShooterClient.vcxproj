@@ -156,7 +156,7 @@
     <!-- New Scene System -->
     <ClCompile Include="src\client\ui\GameObject.cpp" />
     <ClCompile Include="src\client\ui\Scene.cpp" />
-    <ClCompile Include="src\client\ui\SceneManager.cpp" />
+    <ClCompile Include="src\client\ui\UISceneManager.cpp" />
     <ClCompile Include="src\client\ui\ThreadPool.cpp" />
     <ClCompile Include="src\client\ui\Scheduler.cpp" />
     <ClCompile Include="src\client\ui\UIElement.cpp" />
@@ -193,7 +193,7 @@
     <!-- New Scene System Headers -->
     <ClInclude Include="src\client\ui\GameObject.h" />
     <ClInclude Include="src\client\ui\Scene.h" />
-    <ClInclude Include="src\client\ui\SceneManager.h" />
+    <ClInclude Include="src\client\ui\UISceneManager.h" />
     <ClInclude Include="src\client\ui\ThreadPool.h" />
     <ClInclude Include="src\client\ui\Scheduler.h" />
     <ClInclude Include="src\client\ui\UIElement.h" />

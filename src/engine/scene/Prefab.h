@@ -68,7 +68,7 @@ struct Prefab {
                 break;
 
             case ItemType::MEDICAL:
-            case ItemType::CONSUMABLE:
+            case ItemType::FOOD:
                 prefab.meshPath = "assets/models/items/" + item.id + ".obj";
                 prefab.hasPhysics = true;
                 prefab.colliderType = ColliderType::BOX;

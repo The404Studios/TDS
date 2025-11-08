@@ -25,8 +25,7 @@ bool RaidScene::onEnter() {
 
     // Initialize prefabs from ItemDatabase
     auto& itemDb = ItemDatabase::getInstance();
-    for (const auto& pair : itemDb.getAllItems()) {
-        const Item& item = pair.second;
+    for (const Item& item : itemDb.getAllItems()) {
         prefabs[item.id] = Prefab::fromItem(item);
     }
 
@@ -50,8 +49,8 @@ bool RaidScene::onEnter() {
     // Initialize weather
     auto weather = ENGINE.getWeatherSystem();
     if (weather) {
-        weather->setWeather(WeatherType::CLEAR);
-        weather->getTimeOfDay().hour = 12.0f;  // Noon
+        weather->setWeatherType(WeatherType::CLEAR);
+        weather->getTimeOfDayConfig().hour = 12.0f;  // Noon
     }
 
     // Register network callbacks
