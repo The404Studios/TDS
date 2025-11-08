@@ -1,5 +1,9 @@
 #include "RaidScene.h"
 #include "../../engine/GameEngine.h"
+#include "../../engine/weather/WeatherSystem.h"
+#include "../../engine/particles/ParticleSystem.h"
+#include "../../engine/audio/AudioEngine.h"
+#include "../../engine/scene/SceneManager.h"
 #include "../../common/NetworkProtocol.h"
 #include "../../common/ItemDatabase.h"
 #include <iostream>

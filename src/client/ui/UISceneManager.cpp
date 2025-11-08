@@ -58,7 +58,7 @@ void UISceneManager::loadSceneAsync(const std::string& name, std::function<void(
     });
 }
 
-void SceneManager::unloadSceneAsync(const std::string& name, std::function<void()> onComplete) {
+void UISceneManager::unloadSceneAsync(const std::string& name, std::function<void()> onComplete) {
     threadPool.enqueue([this, name, onComplete]() {
         this->unloadScene(name);
         if (onComplete) {
