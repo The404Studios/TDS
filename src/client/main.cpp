@@ -11,6 +11,9 @@
 #include "ui/LoginScene.h"
 #include "ui/MainMenuScene.h"
 #include "ui/UIText.h"
+#include "../engine/GameEngine.h"
+#include "../game/scenes/MenuScene.h"
+#include "../game/scenes/RaidScene.h"
 
 // Global variables
 HWND g_hwnd = nullptr;
@@ -104,42 +107,81 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 // Scene input handlers
 void handleSceneInput(char key) {
-    if (!g_sceneManager) return;
+    // Try UI scenes first
+    if (g_sceneManager) {
+        auto currentScene = g_sceneManager->getCurrentScene();
+        if (currentScene) {
+            // Route input to appropriate UI scene
+            if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+                loginScene->handleInput(key);
+                return;
+            } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+                mainMenuScene->handleInput(key);
+                return;
+            }
+        }
+    }
 
-    auto currentScene = g_sceneManager->getCurrentScene();
-    if (!currentScene) return;
-
-    // Route input to appropriate scene
-    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
-        loginScene->handleInput(key);
-    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
-        mainMenuScene->handleInput(key);
+    // Try engine scenes
+    if (ENGINE.isRunning() && ENGINE.getSceneManager() && ENGINE.getSceneManager()->hasActive()) {
+        auto currentScene = ENGINE.getSceneManager()->current();
+        if (auto menuScene = dynamic_cast<MenuScene*>(currentScene)) {
+            menuScene->handleInput(key);
+        } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
+            raidScene->handleInput(key);
+        }
     }
 }
 
 void handleSceneMouseClick(float x, float y) {
-    if (!g_sceneManager) return;
+    // Try UI scenes first
+    if (g_sceneManager) {
+        auto currentScene = g_sceneManager->getCurrentScene();
+        if (currentScene) {
+            if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+                loginScene->handleMouseClick(x, y);
+                return;
+            } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+                mainMenuScene->handleMouseClick(x, y);
+                return;
+            }
+        }
+    }
 
-    auto currentScene = g_sceneManager->getCurrentScene();
-    if (!currentScene) return;
-
-    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
-        loginScene->handleMouseClick(x, y);
-    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
-        mainMenuScene->handleMouseClick(x, y);
+    // Try engine scenes
+    if (ENGINE.isRunning() && ENGINE.getSceneManager() && ENGINE.getSceneManager()->hasActive()) {
+        auto currentScene = ENGINE.getSceneManager()->current();
+        if (auto menuScene = dynamic_cast<MenuScene*>(currentScene)) {
+            menuScene->handleMouseClick(x, y);
+        } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
+            raidScene->handleMouseClick(x, y);
+        }
     }
 }
 
 void handleSceneMouseMove(float x, float y) {
-    if (!g_sceneManager) return;
+    // Try UI scenes first
+    if (g_sceneManager) {
+        auto currentScene = g_sceneManager->getCurrentScene();
+        if (currentScene) {
+            if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
+                loginScene->handleMouseMove(x, y);
+                return;
+            } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
+                mainMenuScene->handleMouseMove(x, y);
+                return;
+            }
+        }
+    }
 
-    auto currentScene = g_sceneManager->getCurrentScene();
-    if (!currentScene) return;
-
-    if (auto loginScene = std::dynamic_pointer_cast<LoginScene>(currentScene)) {
-        loginScene->handleMouseMove(x, y);
-    } else if (auto mainMenuScene = std::dynamic_pointer_cast<MainMenuScene>(currentScene)) {
-        mainMenuScene->handleMouseMove(x, y);
+    // Try engine scenes
+    if (ENGINE.isRunning() && ENGINE.getSceneManager() && ENGINE.getSceneManager()->hasActive()) {
+        auto currentScene = ENGINE.getSceneManager()->current();
+        if (auto menuScene = dynamic_cast<MenuScene*>(currentScene)) {
+            menuScene->handleMouseMove(x, y);
+        } else if (auto raidScene = dynamic_cast<RaidScene*>(currentScene)) {
+            raidScene->handleMouseMove(x, y);
+        }
     }
 }
 
@@ -205,7 +247,22 @@ bool initializeOpenGL() {
 void initializeScenes() {
     std::cout << "[Client] Initializing scene system..." << std::endl;
 
-    // Create scene manager
+    // Initialize GameEngine (required for game scenes)
+    EngineConfig engineConfig;
+    engineConfig.enableNetworking = true;
+    engineConfig.fixedTimeStep = 1.0f / 60.0f;
+    if (!ENGINE.initialize(engineConfig)) {
+        std::cerr << "[Client] Failed to initialize GameEngine!" << std::endl;
+        return;
+    }
+
+    // Register game scenes with engine SceneManager
+    auto menuScene = ENGINE.getSceneManager()->registerScene<MenuScene>("menu", g_networkClient.get());
+    auto raidScene = ENGINE.getSceneManager()->registerScene<RaidScene>("raid", g_networkClient.get(), 0);
+
+    std::cout << "[Client] Registered engine scenes: menu, raid" << std::endl;
+
+    // Create UI scene manager for login/main menu
     g_sceneManager = std::make_unique<UISceneManager>();
 
     // Create login scene
@@ -218,8 +275,11 @@ void initializeScenes() {
 
     // Setup navigation callbacks for main menu
     g_mainMenuScene->setOnEnterLobby([]() {
-        std::cout << "[Client] Navigate to: Lobby" << std::endl;
-        // TODO: Implement lobby scene
+        std::cout << "[Client] Starting game - switching to menu scene" << std::endl;
+        // Switch to engine-managed menu scene
+        ENGINE.getSceneManager()->switchTo("menu");
+        // Hide UI scene manager rendering
+        g_sceneManager->unloadAllScenes();
     });
 
     g_mainMenuScene->setOnViewStash([]() {
@@ -283,6 +343,9 @@ void cleanup() {
         g_sceneManager->unloadAllScenes();
         g_sceneManager.reset();
     }
+
+    // Shutdown engine
+    ENGINE.shutdown();
 
     g_mainMenuScene.reset();
     g_loginScene.reset();
@@ -360,11 +423,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // Update network
         g_networkClient->update();
 
-        // Update scene manager (handles scheduler and current scene)
-        g_sceneManager->update(deltaTime);
+        // Update UI scene manager (for login/main menu)
+        if (g_sceneManager && g_sceneManager->getCurrentScene()) {
+            g_sceneManager->update(deltaTime);
+            g_sceneManager->render();
+        }
 
-        // Render current scene
-        g_sceneManager->render();
+        // Update engine (for game scenes - menu/raid)
+        if (ENGINE.isRunning() && ENGINE.getSceneManager() && ENGINE.getSceneManager()->hasActive()) {
+            ENGINE.update(deltaTime);
+        }
 
         // Swap buffers
         SwapBuffers(g_hdc);
