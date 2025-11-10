@@ -1,6 +1,7 @@
 #include "GameEngine.h"
 #include "scene/SceneManager.h"
 #include "audio/AudioEngine.h"
+#include "network/NetworkEngine.h"
 #include "particles/ParticleSystem.h"
 #include "weather/WeatherSystem.h"
 #include <iostream>

@@ -12,11 +12,25 @@
 #include "ui/MainMenuScene.h"
 #include "ui/UIText.h"
 #include "../engine/GameEngine.h"
+#include "../engine/scene/SceneManager.h"
 #include "../game/scenes/MenuScene.h"
 #include "../game/scenes/RaidScene.h"
 #include "../game/scenes/LobbyScene.h"
 #include "../game/scenes/StashScene.h"
 #include "../game/scenes/MerchantScene.h"
+
+// Input state structure
+struct InputState {
+    bool keys[256];
+    float mouseX;
+    float mouseY;
+    bool mouseButtons[3];  // Left, Right, Middle
+
+    InputState() : mouseX(0), mouseY(0) {
+        memset(keys, 0, sizeof(keys));
+        memset(mouseButtons, 0, sizeof(mouseButtons));
+    }
+};
 
 // Global variables
 HWND g_hwnd = nullptr;

@@ -10,9 +10,9 @@
 #include <map>
 
 /**
- * Merchant data - represents a trader NPC
+ * MerchantData - represents a trader NPC (client-side)
  */
-struct Merchant {
+struct MerchantData {
     std::string id;
     std::string name;
     std::string description;
@@ -21,7 +21,7 @@ struct Merchant {
     float priceSellMultiplier;  // How much they charge (1.2 = 120% of value)
     std::vector<Item> inventory;  // Items they sell
 
-    Merchant()
+    MerchantData()
         : loyaltyLevel(1), priceBuyMultiplier(0.4f), priceSellMultiplier(1.0f) {}
 };
 
@@ -51,7 +51,7 @@ private:
     int playerRoubles;
 
     // Merchants
-    std::map<std::string, Merchant> merchants;
+    std::map<std::string, MerchantData> merchants;
     std::string currentMerchantId;
 
     // UI State

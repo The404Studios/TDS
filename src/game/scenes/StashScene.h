@@ -61,7 +61,7 @@ private:
 
     // Selected item
     Item* selectedItem;
-    std::shared_ptr<Text> itemDetailsText;
+    std::shared_ptr<UIText> itemDetailsText;
 
     // Filter/Sort
     enum class SortMode {

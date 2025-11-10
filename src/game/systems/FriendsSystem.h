@@ -7,9 +7,9 @@
 #include <functional>
 
 /**
- * Friend - Represents a friend connection
+ * GameFriend - Represents a friend connection (client-side)
  */
-struct Friend {
+struct GameFriend {
     uint64_t accountId;
     std::string username;
 
@@ -26,20 +26,20 @@ struct Friend {
     uint64_t partyId;
     bool isPartyLeader;
 
-    Friend() : accountId(0), status(Status::OFFLINE), partyId(0), isPartyLeader(false) {}
+    GameFriend() : accountId(0), status(Status::OFFLINE), partyId(0), isPartyLeader(false) {}
 };
 
 /**
- * FriendRequest - Pending friend request
+ * GameFriendRequest - Pending friend request (client-side)
  */
-struct FriendRequest {
+struct GameFriendRequest {
     uint64_t fromAccountId;
     uint64_t toAccountId;
     std::string fromUsername;
     std::string toUsername;
     uint64_t timestamp;
 
-    FriendRequest() : fromAccountId(0), toAccountId(0), timestamp(0) {}
+    GameFriendRequest() : fromAccountId(0), toAccountId(0), timestamp(0) {}
 };
 
 /**
@@ -54,39 +54,39 @@ public:
     void addFriend(uint64_t accountId, const std::string& username);
     void removeFriend(uint64_t accountId);
     bool isFriend(uint64_t accountId) const;
-    Friend* getFriend(uint64_t accountId);
-    const std::vector<Friend>& getFriendsList() const { return friends; }
+    GameFriend* getFriend(uint64_t accountId);
+    const std::vector<GameFriend>& getFriendsList() const { return friends; }
 
     // Friend requests
     void sendFriendRequest(uint64_t toAccountId, const std::string& toUsername);
     void acceptFriendRequest(uint64_t fromAccountId);
     void declineFriendRequest(uint64_t fromAccountId);
-    const std::vector<FriendRequest>& getPendingRequests() const { return pendingRequests; }
-    const std::vector<FriendRequest>& getSentRequests() const { return sentRequests; }
+    const std::vector<GameFriendRequest>& getPendingRequests() const { return pendingRequests; }
+    const std::vector<GameFriendRequest>& getSentRequests() const { return sentRequests; }
 
     // Status updates
-    void updateFriendStatus(uint64_t accountId, Friend::Status status);
+    void updateFriendStatus(uint64_t accountId, GameFriend::Status status);
     void updateFriendParty(uint64_t accountId, uint64_t partyId, bool isLeader);
 
     // Filtering
-    std::vector<Friend*> getOnlineFriends();
-    std::vector<Friend*> getFriendsInMenu();
-    std::vector<Friend*> getFriendsInLobby();
+    std::vector<GameFriend*> getOnlineFriends();
+    std::vector<GameFriend*> getFriendsInMenu();
+    std::vector<GameFriend*> getFriendsInLobby();
 
     // Invites
     void inviteToParty(uint64_t friendAccountId);
 
     // Callbacks
-    void setOnFriendRequestReceived(std::function<void(const FriendRequest&)> callback) {
+    void setOnFriendRequestReceived(std::function<void(const GameFriendRequest&)> callback) {
         onFriendRequestReceived = callback;
     }
-    void setOnFriendAdded(std::function<void(const Friend&)> callback) {
+    void setOnFriendAdded(std::function<void(const GameFriend&)> callback) {
         onFriendAdded = callback;
     }
     void setOnFriendRemoved(std::function<void(uint64_t)> callback) {
         onFriendRemoved = callback;
     }
-    void setOnFriendStatusChanged(std::function<void(const Friend&)> callback) {
+    void setOnFriendStatusChanged(std::function<void(const GameFriend&)> callback) {
         onFriendStatusChanged = callback;
     }
     void setOnPartyInviteReceived(std::function<void(uint64_t, const std::string&)> callback) {
@@ -94,14 +94,14 @@ public:
     }
 
 private:
-    std::vector<Friend> friends;
-    std::vector<FriendRequest> pendingRequests;  // Requests we've received
-    std::vector<FriendRequest> sentRequests;     // Requests we've sent
+    std::vector<GameFriend> friends;
+    std::vector<GameFriendRequest> pendingRequests;  // Requests we've received
+    std::vector<GameFriendRequest> sentRequests;     // Requests we've sent
 
     // Callbacks
-    std::function<void(const FriendRequest&)> onFriendRequestReceived;
-    std::function<void(const Friend&)> onFriendAdded;
+    std::function<void(const GameFriendRequest&)> onFriendRequestReceived;
+    std::function<void(const GameFriend&)> onFriendAdded;
     std::function<void(uint64_t)> onFriendRemoved;
-    std::function<void(const Friend&)> onFriendStatusChanged;
+    std::function<void(const GameFriend&)> onFriendStatusChanged;
     std::function<void(uint64_t, const std::string&)> onPartyInviteReceived;
 };

@@ -70,7 +70,7 @@ private:
 
     // Friends list
     struct FriendUI {
-        Friend* friendPtr;
+        GameFriend* friendPtr;
         std::shared_ptr<UIText> nameText;
         std::shared_ptr<UIText> statusText;
         std::shared_ptr<UIButton> inviteButton;
@@ -80,7 +80,7 @@ private:
 
     // Friend request list
     struct FriendRequestUI {
-        FriendRequest* request;
+        GameFriendRequest* request;
         std::shared_ptr<UIText> nameText;
         std::shared_ptr<UIButton> acceptButton;
         std::shared_ptr<UIButton> declineButton;
