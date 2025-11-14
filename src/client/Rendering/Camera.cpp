@@ -51,6 +51,22 @@ void Camera::setRotation(float y, float p) {
     updateCameraVectors();
 }
 
+void Camera::setPitch(float newPitch) {
+    pitch = newPitch;
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
+    updateCameraVectors();
+}
+
+void Camera::setYaw(float newYaw) {
+    yaw = newYaw;
+    updateCameraVectors();
+}
+
+void Camera::setFOV(float fov) {
+    camera.fovy = fov;
+}
+
 void Camera::moveForward(float amount) {
     camera.position.x += forward.x * amount;
     camera.position.z += forward.z * amount;

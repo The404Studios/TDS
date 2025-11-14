@@ -1,0 +1,16 @@
+# TDS Animation File
+# Bone: weapon
+ANIMATION_VERSION 1.0
+
+KEYFRAME 0
+  POS 0.0 0.0 0.0
+  ROT 0.0 0.0 0.0
+KEYFRAME 15
+  POS 0.0 -0.3 -0.2
+  ROT -45.0 0.0 0.0
+KEYFRAME 30
+  POS 0.0 -0.3 -0.2
+  ROT -45.0 0.0 0.0
+KEYFRAME 45
+  POS 0.0 0.0 0.0
+  ROT 0.0 0.0 0.0

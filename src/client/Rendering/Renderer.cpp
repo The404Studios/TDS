@@ -46,11 +46,27 @@ void Renderer::render() {
 }
 
 void Renderer::drawWeapon() {
-    // Get weapon model
-    Model* weapon = game->getModelManager()->getModel("weapon");
+    // Get weapon model based on player's current weapon
+    uint16_t weaponId = game->getPlayer()->getCurrentWeapon();
+    Model* weapon = nullptr;
+
+    // Try to get specific weapon model, fallback to generic
+    if (weaponId == Items::AK74 || weaponId == Items::AK74M) {
+        weapon = game->getModelManager()->getModel("ak74");
+    } else if (weaponId == Items::M4A1) {
+        weapon = game->getModelManager()->getModel("m4a1");
+    } else if (weaponId == Items::GLOCK_17 || weaponId == Items::MAKAROV) {
+        weapon = game->getModelManager()->getModel("glock");
+    } else if (weaponId == Items::SVD) {
+        weapon = game->getModelManager()->getModel("svd");
+    }
+
+    if (!weapon) {
+        weapon = game->getModelManager()->getModel("weapon");
+    }
     if (!weapon) return;
 
-    // Position weapon relative to camera
+    // Position weapon relative to camera using player's weapon offset
     Camera* camera = game->getCamera();
     if (!camera) return;
 
@@ -58,15 +74,26 @@ void Renderer::drawWeapon() {
     TDS::Vector3 forward = camera->getForward();
     TDS::Vector3 right = camera->getRight();
 
-    // Weapon offset (right and down from camera)
+    // Get weapon offset from player (includes ADS, bob, sway, recoil)
+    TDS::Vector3 offset = game->getPlayer()->getWeaponOffset();
+
+    // Apply offset relative to camera orientation
     ::Vector3 weaponPos = {
-        camPos.x + right.x * 0.3f + forward.x * 0.5f,
-        camPos.y - 0.3f + forward.y * 0.5f,
-        camPos.z + right.z * 0.3f + forward.z * 0.5f
+        camPos.x + right.x * offset.x + forward.x * (-offset.z),
+        camPos.y + offset.y,
+        camPos.z + right.z * offset.x + forward.z * (-offset.z)
     };
 
-    // Draw weapon
-    DrawModel(*weapon, weaponPos, 0.5f, DARKGRAY);
+    // Calculate weapon rotation to match camera
+    float yaw = camera->getYaw();
+    float pitch = camera->getPitch();
+
+    // Draw weapon with orientation
+    // Note: Raylib DrawModelEx allows rotation
+    Vector3 rotationAxis = {0, 1, 0};
+    float rotationAngle = yaw;
+
+    DrawModelEx(*weapon, weaponPos, rotationAxis, rotationAngle, (Vector3){0.3f, 0.3f, 0.3f}, DARKGRAY);
 }
 
 } // namespace TDS

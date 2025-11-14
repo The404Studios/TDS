@@ -20,12 +20,31 @@ Player::Player(Game* game)
     , isGrounded(false)
     , isCrouching(false)
     , isSprinting(false)
+    , isAiming(false)
+    , isReloading(false)
     , currentWeaponIndex(0)
+    , weaponSwayAmount(0.0f)
+    , weaponBobTime(0.0f)
+    , recoilTime(0.0f)
+    , baseFOV(75.0f)
+    , currentFOV(75.0f)
+    , targetFOV(75.0f)
+    , sprintFOV(85.0f)
+    , adsFOV(55.0f)
+    , adsTransitionSpeed(8.0f)
+    , adsProgress(0.0f)
     , networkUpdateTimer(0.0f)
     , networkUpdateInterval(0.05f) // 20 Hz updates
 {
     position = TDS::Vector3(0, 1.7f, 0);
     velocity = TDS::Vector3(0, 0, 0);
+
+    // Initialize weapon offsets
+    hipFireOffset = TDS::Vector3(0.3f, -0.15f, -0.5f);  // Right and slightly down
+    adsOffset = TDS::Vector3(0.0f, -0.05f, -0.35f);     // Centered and closer
+    weaponOffset = hipFireOffset;
+    weaponTargetOffset = hipFireOffset;
+    recoilOffset = TDS::Vector3(0, 0, 0);
 
     // Initialize with default weapon
     equippedWeapons.push_back(Items::AK74);
@@ -36,6 +55,9 @@ Player::~Player() {}
 void Player::update(float dt) {
     handleInput(dt);
     updatePhysics(dt);
+    updateWeaponMotion(dt);
+    updateADS(dt);
+    updateFOV(dt);
     updateNetworkSync(dt);
 }
 
@@ -114,13 +136,20 @@ void Player::handleInput(float dt) {
         switchWeapon((currentWeaponIndex - 1 + equippedWeapons.size()) % equippedWeapons.size());
     }
 
+    // Aim Down Sights (hold right mouse button)
+    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) && !isSprinting && !isReloading) {
+        isAiming = true;
+    } else {
+        isAiming = false;
+    }
+
     // Shooting
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !isReloading) {
         shoot();
     }
 
     // Reload
-    if (IsKeyPressed(KEY_R)) {
+    if (IsKeyPressed(KEY_R) && !isReloading) {
         reload();
     }
 }
@@ -169,11 +198,127 @@ void Player::updateNetworkSync(float dt) {
             state.weaponIndex = currentWeaponIndex;
             state.health = static_cast<uint16_t>(health);
             state.maxHealth = static_cast<uint16_t>(maxHealth);
-            state.flags = (isCrouching ? 1 : 0) | (isSprinting ? 2 : 0);
+            state.flags = (isCrouching ? 1 : 0) | (isSprinting ? 2 : 0) | (isAiming ? 4 : 0);
 
             game->getNetwork()->sendPlayerMove(state);
         }
     }
+}
+
+void Player::updateWeaponMotion(float dt) {
+    // Calculate movement speed for weapon bob
+    float moveSpeed = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+
+    // Update weapon bob time
+    if (moveSpeed > 0.1f && isGrounded) {
+        weaponBobTime += dt * moveSpeed * 2.0f;
+    } else {
+        weaponBobTime = 0.0f;
+    }
+
+    // Calculate weapon bob offset
+    TDS::Vector3 bobOffset(0, 0, 0);
+    if (moveSpeed > 0.1f && !isAiming) {
+        float bobFrequency = isSprinting ? 1.8f : 1.0f;
+        bobOffset.x = sinf(weaponBobTime * bobFrequency) * 0.02f;
+        bobOffset.y = fabsf(sinf(weaponBobTime * 2.0f * bobFrequency)) * 0.03f;
+    }
+
+    // Calculate weapon sway from mouse movement
+    TDS::Vector3 swayOffset(0, 0, 0);
+    if (!isAiming) {
+        Vector2 mouseDelta = GetMouseDelta();
+        float swayScale = 0.001f;
+        swayOffset.x = -mouseDelta.x * swayScale;
+        swayOffset.y = -mouseDelta.y * swayScale;
+
+        // Clamp sway
+        swayOffset.x = Clamp(swayOffset.x, -0.05f, 0.05f);
+        swayOffset.y = Clamp(swayOffset.y, -0.05f, 0.05f);
+    }
+
+    // Update recoil recovery
+    if (recoilTime > 0.0f) {
+        recoilTime -= dt * 3.0f; // Recover over time
+        if (recoilTime < 0.0f) recoilTime = 0.0f;
+    }
+
+    // Smooth recoil offset recovery
+    recoilOffset.x = Lerp(recoilOffset.x, 0.0f, dt * 5.0f);
+    recoilOffset.y = Lerp(recoilOffset.y, 0.0f, dt * 5.0f);
+    recoilOffset.z = Lerp(recoilOffset.z, 0.0f, dt * 10.0f);
+
+    // Combine all offsets
+    TDS::Vector3 totalOffset = TDS::Math::add(weaponTargetOffset, bobOffset);
+    totalOffset = TDS::Math::add(totalOffset, swayOffset);
+    totalOffset = TDS::Math::add(totalOffset, recoilOffset);
+
+    // Smoothly interpolate to target offset
+    weaponOffset.x = Lerp(weaponOffset.x, totalOffset.x, dt * 10.0f);
+    weaponOffset.y = Lerp(weaponOffset.y, totalOffset.y, dt * 10.0f);
+    weaponOffset.z = Lerp(weaponOffset.z, totalOffset.z, dt * 10.0f);
+}
+
+void Player::updateADS(float dt) {
+    // Smoothly transition between hip fire and ADS
+    float targetProgress = isAiming ? 1.0f : 0.0f;
+    adsProgress = Lerp(adsProgress, targetProgress, dt * adsTransitionSpeed);
+
+    // Interpolate weapon position between hip and ADS
+    weaponTargetOffset.x = Lerp(hipFireOffset.x, adsOffset.x, adsProgress);
+    weaponTargetOffset.y = Lerp(hipFireOffset.y, adsOffset.y, adsProgress);
+    weaponTargetOffset.z = Lerp(hipFireOffset.z, adsOffset.z, adsProgress);
+}
+
+void Player::updateFOV(float dt) {
+    // Determine target FOV based on state
+    if (isAiming) {
+        targetFOV = adsFOV;
+    } else if (isSprinting) {
+        targetFOV = sprintFOV;
+    } else {
+        targetFOV = baseFOV;
+    }
+
+    // Smoothly interpolate FOV
+    currentFOV = Lerp(currentFOV, targetFOV, dt * 8.0f);
+
+    // Update camera FOV
+    if (game->getCamera()) {
+        game->getCamera()->setFOV(currentFOV);
+    }
+}
+
+void Player::applyRecoil() {
+    if (equippedWeapons.empty()) return;
+
+    uint16_t weaponId = equippedWeapons[currentWeaponIndex];
+    auto* weaponData = ItemDatabase::getWeapon(weaponId);
+    if (!weaponData) return;
+
+    // Apply weapon-specific recoil
+    float recoilAmount = 0.05f; // Base recoil
+
+    // Reduce recoil when aiming
+    if (isAiming) {
+        recoilAmount *= 0.4f;
+    }
+
+    // Apply recoil offset
+    recoilOffset.y += recoilAmount * 0.5f;  // Vertical kick
+    recoilOffset.z -= recoilAmount * 0.3f;  // Weapon pushback
+    recoilOffset.x += (GetRandomValue(-100, 100) / 1000.0f) * recoilAmount; // Horizontal spread
+
+    // Apply camera recoil (pitch up)
+    if (game->getCamera()) {
+        float cameraPitchRecoil = recoilAmount * 200.0f;
+        if (isAiming) cameraPitchRecoil *= 0.5f;
+
+        float currentPitch = game->getCamera()->getPitch();
+        game->getCamera()->setPitch(currentPitch + cameraPitchRecoil);
+    }
+
+    recoilTime = 1.0f;
 }
 
 void Player::shoot() {
@@ -198,6 +343,9 @@ void Player::shoot() {
     // Perform raycast (simplified - no actual hit detection yet)
     // TODO: Check against world geometry and other players
 
+    // Apply recoil
+    applyRecoil();
+
     // Send fire event to server
     if (game->getNetwork() && game->getNetwork()->isConnected()) {
         WeaponFireEvent fireEvent;
@@ -210,16 +358,38 @@ void Player::shoot() {
         game->getNetwork()->sendWeaponFire(fireEvent);
     }
 
-    // Play sound effect
-    // TODO: game->getAudio()->playSound(weaponData->fireSound);
+    // Play sound effect (if available)
+    if (game->getAudio()) {
+        // Try weapon-specific sound, fallback to generic
+        if (weaponData->type == Items::WEAPON_TYPE_RIFLE) {
+            game->getAudio()->playSound("ak47_fire", 0.7f);
+        } else if (weaponData->type == Items::WEAPON_TYPE_PISTOL) {
+            game->getAudio()->playSound("pistol_fire", 0.6f);
+        } else if (weaponData->type == Items::WEAPON_TYPE_SNIPER) {
+            game->getAudio()->playSound("sniper_fire", 0.8f);
+        }
+    }
 
     // Visual effects
-    // TODO: Muzzle flash, recoil, etc.
+    // TODO: Muzzle flash
 }
 
 void Player::reload() {
+    if (equippedWeapons.empty()) return;
+
     TraceLog(LOG_INFO, "Reloading weapon...");
-    // TODO: Implement reload logic with animation
+
+    isReloading = true;
+
+    // Play reload sound
+    if (game->getAudio()) {
+        game->getAudio()->playSound("reload", 0.5f);
+    }
+
+    // TODO: Implement actual reload animation and ammo system
+    // For now, just simulate a 2-second reload time
+    // In a real implementation, you would use a timer or animation callback
+    isReloading = false; // Will be set to false after animation completes
 }
 
 void Player::switchWeapon(int index) {
@@ -281,6 +451,18 @@ bool Player::getIsSprinting() const {
 uint16_t Player::getCurrentWeapon() const {
     if (equippedWeapons.empty()) return 0;
     return equippedWeapons[currentWeaponIndex];
+}
+
+bool Player::getIsAiming() const {
+    return isAiming;
+}
+
+TDS::Vector3 Player::getWeaponOffset() const {
+    return weaponOffset;
+}
+
+float Player::getCurrentFOV() const {
+    return currentFOV;
 }
 
 } // namespace TDS

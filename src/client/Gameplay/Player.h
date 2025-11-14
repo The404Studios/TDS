@@ -21,7 +21,10 @@ public:
     float getMaxHealth() const;
     bool getIsCrouching() const;
     bool getIsSprinting() const;
+    bool getIsAiming() const;
     uint16_t getCurrentWeapon() const;
+    TDS::Vector3 getWeaponOffset() const;
+    float getCurrentFOV() const;
 
     // Setters
     void setPosition(const TDS::Vector3& pos);
@@ -37,6 +40,10 @@ private:
     void handleInput(float dt);
     void updatePhysics(float dt);
     void updateNetworkSync(float dt);
+    void updateWeaponMotion(float dt);
+    void updateADS(float dt);
+    void updateFOV(float dt);
+    void applyRecoil();
     void die();
 
     Game* game;
@@ -58,10 +65,33 @@ private:
     bool isGrounded;
     bool isCrouching;
     bool isSprinting;
+    bool isAiming;
+    bool isReloading;
 
     // Weapons
     std::vector<uint16_t> equippedWeapons;
     int currentWeaponIndex;
+
+    // Weapon motion and ADS
+    TDS::Vector3 weaponOffset;         // Current weapon position offset
+    TDS::Vector3 weaponTargetOffset;   // Target offset for smooth interpolation
+    TDS::Vector3 hipFireOffset;        // Default hip fire position
+    TDS::Vector3 adsOffset;            // Aim down sights position
+    float weaponSwayAmount;            // Current sway magnitude
+    float weaponBobTime;               // Time accumulator for head bob
+    float recoilTime;                  // Time since last shot (for recoil recovery)
+    TDS::Vector3 recoilOffset;         // Current recoil offset
+
+    // FOV
+    float baseFOV;
+    float currentFOV;
+    float targetFOV;
+    float sprintFOV;
+    float adsFOV;
+
+    // ADS transition
+    float adsTransitionSpeed;
+    float adsProgress;                 // 0.0 = hip fire, 1.0 = fully aimed
 
     // Network
     float networkUpdateTimer;

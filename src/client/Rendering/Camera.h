@@ -22,6 +22,9 @@ public:
     // Camera control
     void setPosition(const Vector3& pos);
     void setRotation(float yaw, float pitch);
+    void setPitch(float newPitch);
+    void setYaw(float newYaw);
+    void setFOV(float fov);
     void moveForward(float amount);
     void moveRight(float amount);
     void rotate(float yawDelta, float pitchDelta);
@@ -32,6 +35,7 @@ public:
     Vector3 getRight() const;
     float getYaw() const { return yaw; }
     float getPitch() const { return pitch; }
+    float getFOV() const { return camera.fovy; }
 
 private:
     void updateCameraVectors();
