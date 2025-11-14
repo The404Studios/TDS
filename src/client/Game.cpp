@@ -89,6 +89,11 @@ void Game::update(float dt) {
         network->update();
     }
 
+    // Update audio (music streaming)
+    if (audio) {
+        audio->updateMusic();
+    }
+
     // Update based on state
     switch (state) {
         case GameState::LOGIN:
