@@ -2,6 +2,7 @@
 #include "../../common/NetworkProtocol.h"
 #include "../../common/DataStructures.h"
 #include "../../common/ItemDatabase.h"
+#include "../../common/CorpseSystem.h"
 #include <map>
 #include <vector>
 #include <string>
@@ -44,13 +45,21 @@ public:
     // Get extraction zones
     const std::vector<ExtractionZone>& getExtractionZones() const;
 
+    // Corpse system
+    CorpseManager& getCorpseManager() { return corpseManager; }
+    const std::vector<Corpse> getMatchCorpses(uint64_t matchId);
+    bool lootCorpse(uint64_t accountId, uint64_t corpseId, int itemIndex, bool fromEquipped, Item& outItem);
+    std::vector<Item> lootAllFromCorpse(uint64_t accountId, uint64_t corpseId);
+
 private:
     std::map<uint64_t, Match> matches;
     std::map<uint64_t, uint64_t> playerMatches;  // accountId -> matchId
     std::map<uint64_t, std::vector<LootSpawn>> matchLoot;
     std::map<uint64_t, std::vector<AIEnemy>> matchEnemies;
+    std::map<uint64_t, std::vector<uint64_t>> matchCorpses;  // matchId -> corpse IDs
     std::vector<ExtractionZone> extractionZones;
     uint64_t nextMatchId;
+    CorpseManager corpseManager;
 
     void generateSpawnPositions(Match& match);
     void generateLoot(Match& match);

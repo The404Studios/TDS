@@ -117,6 +117,24 @@ bool MatchManager::playerTakeDamage(uint64_t accountId, float damage, uint64_t a
 
         std::cout << "[MatchManager] Player " << accountId << " died in match " << match->matchId << std::endl;
 
+        // Create corpse with player's gear
+        std::vector<Item> inventory;  // TODO: Get from player's actual loadout
+        std::vector<Item> equipped;    // TODO: Get from player's actual equipped items
+
+        uint64_t corpseId = corpseManager.createCorpse(
+            accountId,
+            player->username,
+            player->x, player->y, player->z,
+            player->yaw,
+            inventory,
+            equipped
+        );
+
+        // Track corpse in match
+        matchCorpses[match->matchId].push_back(corpseId);
+
+        std::cout << "[MatchManager] Created corpse " << corpseId << " for player " << accountId << std::endl;
+
         // Check if match should end
         if (match->allExtractedOrDead()) {
             endMatch(match->matchId);
@@ -382,6 +400,97 @@ void MatchManager::endMatch(uint64_t matchId) {
     matchLoot.erase(matchId);
     matchEnemies.erase(matchId);
 
+    // Clean up corpses
+    if (matchCorpses.find(matchId) != matchCorpses.end()) {
+        for (uint64_t corpseId : matchCorpses[matchId]) {
+            corpseManager.removeCorpse(corpseId);
+        }
+        matchCorpses.erase(matchId);
+    }
+
     // Mark as finished
     match.state = MatchState::FINISHED;
+}
+
+// Corpse system implementations
+const std::vector<Corpse> MatchManager::getMatchCorpses(uint64_t matchId) {
+    std::vector<Corpse> result;
+
+    if (matchCorpses.find(matchId) != matchCorpses.end()) {
+        for (uint64_t corpseId : matchCorpses[matchId]) {
+            Corpse* corpse = corpseManager.getCorpse(corpseId);
+            if (corpse) {
+                result.push_back(*corpse);
+            }
+        }
+    }
+
+    return result;
+}
+
+bool MatchManager::lootCorpse(uint64_t accountId, uint64_t corpseId, int itemIndex, bool fromEquipped, Item& outItem) {
+    Match* match = getPlayerMatch(accountId);
+    if (!match) return false;
+
+    MatchPlayer* player = match->findPlayer(accountId);
+    if (!player || !player->alive) return false;
+
+    Corpse* corpse = corpseManager.getCorpse(corpseId);
+    if (!corpse) return false;
+
+    // Validate player can loot this corpse (distance check)
+    if (!corpseManager.canLootCorpse(corpseId, player->x, player->y, player->z)) {
+        std::cout << "[MatchManager] Player " << accountId << " too far from corpse " << corpseId << std::endl;
+        return false;
+    }
+
+    // Get the item before looting
+    std::vector<Item>& source = fromEquipped ? corpse->equipped : corpse->inventory;
+
+    if (itemIndex < 0 || itemIndex >= static_cast<int>(source.size())) {
+        return false;
+    }
+
+    outItem = source[itemIndex];
+    outItem.foundInRaid = true;  // Mark as FiR since looted from player
+
+    // Loot the item
+    if (corpseManager.lootItem(corpseId, itemIndex, accountId, fromEquipped)) {
+        player->lootCollected.push_back(outItem);
+        std::cout << "[MatchManager] Player " << accountId << " looted " << outItem.name
+                  << " from corpse " << corpseId << std::endl;
+        return true;
+    }
+
+    return false;
+}
+
+std::vector<Item> MatchManager::lootAllFromCorpse(uint64_t accountId, uint64_t corpseId) {
+    std::vector<Item> result;
+
+    Match* match = getPlayerMatch(accountId);
+    if (!match) return result;
+
+    MatchPlayer* player = match->findPlayer(accountId);
+    if (!player || !player->alive) return result;
+
+    // Validate player can loot this corpse
+    if (!corpseManager.canLootCorpse(corpseId, player->x, player->y, player->z)) {
+        std::cout << "[MatchManager] Player " << accountId << " too far from corpse " << corpseId << std::endl;
+        return result;
+    }
+
+    // Loot all items
+    result = corpseManager.lootAll(corpseId, accountId);
+
+    // Mark all as FiR and add to player's collected loot
+    for (Item& item : result) {
+        item.foundInRaid = true;
+        player->lootCollected.push_back(item);
+    }
+
+    std::cout << "[MatchManager] Player " << accountId << " looted all " << result.size()
+              << " items from corpse " << corpseId << std::endl;
+
+    return result;
 }
