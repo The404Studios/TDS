@@ -133,6 +133,8 @@ if(BUILD_CLIENT)
     target_include_directories(TDS_Client PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/src/client
+        ${CMAKE_SOURCE_DIR}/external/enet/include
+        ${CMAKE_BINARY_DIR}/_deps/raylib-src/examples/shapes  # For raygui.h
     )
 
     target_link_libraries(TDS_Client PRIVATE

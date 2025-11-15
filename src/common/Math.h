@@ -4,6 +4,17 @@
 #include <cmath>
 #include <algorithm>
 
+// Undefine raylib macros to avoid conflicts with our constexpr
+#ifdef PI
+#undef PI
+#endif
+#ifdef DEG2RAD
+#undef DEG2RAD
+#endif
+#ifdef RAD2DEG
+#undef RAD2DEG
+#endif
+
 namespace TDS {
 namespace Math {
 

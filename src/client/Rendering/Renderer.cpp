@@ -2,6 +2,9 @@
 #include "../Game.h"
 #include "Camera.h"
 #include "ModelManager.h"
+#include "../Gameplay/Player.h"
+#include "common/Items.h"
+#include "common/Protocol.h"
 #include "raylib.h"
 
 namespace TDS {
@@ -55,7 +58,7 @@ void Renderer::drawWeapon() {
         weapon = game->getModelManager()->getModel("ak74");
     } else if (weaponId == Items::M4A1) {
         weapon = game->getModelManager()->getModel("m4a1");
-    } else if (weaponId == Items::GLOCK_17 || weaponId == Items::MAKAROV) {
+    } else if (weaponId == Items::GLOCK17) {
         weapon = game->getModelManager()->getModel("glock");
     } else if (weaponId == Items::SVD) {
         weapon = game->getModelManager()->getModel("svd");
@@ -90,10 +93,11 @@ void Renderer::drawWeapon() {
 
     // Draw weapon with orientation
     // Note: Raylib DrawModelEx allows rotation
-    Vector3 rotationAxis = {0, 1, 0};
+    ::Vector3 rotationAxis = {0, 1, 0};
     float rotationAngle = yaw;
 
-    DrawModelEx(*weapon, weaponPos, rotationAxis, rotationAngle, (Vector3){0.3f, 0.3f, 0.3f}, DARKGRAY);
+    ::Vector3 scale = {0.3f, 0.3f, 0.3f};
+    DrawModelEx(*weapon, weaponPos, rotationAxis, rotationAngle, scale, DARKGRAY);
 }
 
 } // namespace TDS

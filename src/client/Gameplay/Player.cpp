@@ -1,8 +1,10 @@
 #include "Player.h"
 #include "../Game.h"
-#include "Rendering/Camera.h"
-#include "Network/NetworkClient.h"
+#include "../Rendering/Camera.h"
+#include "../Network/NetworkClient.h"
+#include "../Audio/AudioManager.h"
 #include "common/Math.h"
+#include "common/Items.h"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -361,11 +363,11 @@ void Player::shoot() {
     // Play sound effect (if available)
     if (game->getAudio()) {
         // Try weapon-specific sound, fallback to generic
-        if (weaponData->type == Items::WEAPON_TYPE_RIFLE) {
+        if (weaponData->type == WeaponType::ASSAULT_RIFLE) {
             game->getAudio()->playSound("ak47_fire", 0.7f);
-        } else if (weaponData->type == Items::WEAPON_TYPE_PISTOL) {
+        } else if (weaponData->type == WeaponType::PISTOL) {
             game->getAudio()->playSound("pistol_fire", 0.6f);
-        } else if (weaponData->type == Items::WEAPON_TYPE_SNIPER) {
+        } else if (weaponData->type == WeaponType::SNIPER_RIFLE) {
             game->getAudio()->playSound("sniper_fire", 0.8f);
         }
     }
