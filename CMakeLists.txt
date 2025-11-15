@@ -197,6 +197,8 @@ if(BUILD_SERVER)
     target_include_directories(TDS_Server PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/src/server
+        ${CMAKE_SOURCE_DIR}/external/enet/include
+        ${CMAKE_SOURCE_DIR}/external/sqlite
     )
 
     target_link_libraries(TDS_Server PRIVATE
