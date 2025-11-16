@@ -1,0 +1,57 @@
+# Dependencies (downloaded by download_dependencies.bat)
+dependencies/
+
+# Visual Studio build outputs
+.vs/
+x64/
+x86/
+Debug/
+Release/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.db
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# Build artifacts
+*.obj
+*.pdb
+*.idb
+*.ilk
+*.log
+*.tlog
+*.lastbuildstate
+*.iobj
+*.ipdb
+*.exp
+*.lib
+*.exe
+*.dll
+*.pch
+
+# Server data files (generated at runtime)
+Server/accounts.dat
+Server/friendships.dat
+Server/playerdata_*.dat
+Data/
+
+# User-specific files
+*.vcxproj.user
+*.vcxproj.filters
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Resource files (if you add custom models/sounds)
+# Uncomment if you want to ignore custom assets
+# resources/models/*
+# resources/sounds/*
+# resources/textures/*
+# !resources/models/.gitkeep
+# !resources/sounds/.gitkeep
+# !resources/textures/.gitkeep

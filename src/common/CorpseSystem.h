@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <string>
 #include <chrono>
+#include <iostream>
 
 // Represents a corpse in the world
 struct Corpse {

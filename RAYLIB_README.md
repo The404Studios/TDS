@@ -2,6 +2,19 @@
 
 A complete multiplayer 3D looter extraction shooter built with **raylib**, **raygui**, and featuring **NAT punchthrough** for peer-to-peer connectivity.
 
+## ⚠️ IMPORTANT: Download Dependencies First!
+
+Before building, **you MUST run**:
+```cmd
+download_dependencies.bat
+```
+
+This downloads raylib, raygui, and ENet. Without this, the project will not compile!
+
+See [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md) for detailed build steps.
+
+---
+
 ## Features
 
 ### Core Game Features
