@@ -25,6 +25,7 @@ cmake_install.cmake
 Makefile
 *.cmake
 !CMakeLists.txt
+compile_commands.json
 
 # IDE files
 .vscode/
@@ -32,6 +33,22 @@ Makefile
 *.swp
 *.swo
 *~
+
+# Visual Studio
+.vs/
+out/
+x64/
+x86/
+Debug/
+Release/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
 # OS files
 .DS_Store
