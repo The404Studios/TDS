@@ -43,3 +43,6 @@ Thumbs.db
 # Database files
 *.db
 *.sqlite
+
+# Old code archive
+.old_code/
