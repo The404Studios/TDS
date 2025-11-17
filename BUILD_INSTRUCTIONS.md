@@ -13,6 +13,21 @@ This downloads:
 - raygui
 - ENet (for NAT punchthrough)
 
+### Verify Your Environment (Optional but Recommended)
+
+Before building, verify your environment is set up correctly:
+
+```cmd
+verify_build_env.bat
+```
+
+This checks:
+- MSBuild is installed
+- raylib dependencies are present
+- Project files exist
+
+If verification passes, you're ready to build!
+
 ## Building
 
 ### Recommended: Build Raylib Client Only
@@ -73,14 +88,28 @@ NatPunchServer.exe
 
 ## Troubleshooting
 
-### "Cannot open include file: 'raylib.h'"
-**Solution**: Run `download_dependencies.bat` first!
+### Quick Fixes
 
-### Old client compilation errors
-**Solution**: Build only **ExtractionShooterRaylib** instead of the whole solution. The old OpenGL client (ExtractionShooterClient) is legacy code.
+**"Cannot open include file: 'raylib.h'"**
+→ Run `download_dependencies.bat` first!
 
-### Missing DLLs when running
-**Solution**: Make sure you're running from the `x64\Release` or `x64\Debug` directory, or copy raylib.dll to the executable directory.
+**Old client compilation errors**
+→ Build only **ExtractionShooterRaylib** instead of the whole solution. The old OpenGL client (ExtractionShooterClient) is legacy code.
+
+**Missing DLLs when running**
+→ Make sure you're running from the `x64\Release` or `x64\Debug` directory, or copy raylib.dll to the executable directory.
+
+**Thousands of compilation errors**
+→ Dependencies not downloaded! Run `download_dependencies.bat` and rebuild.
+
+### Need More Help?
+
+See **TROUBLESHOOTING.md** for comprehensive solutions to common issues including:
+- Build errors and compilation issues
+- Runtime errors and crashes
+- Networking and connectivity problems
+- Performance optimization
+- Platform-specific issues
 
 ## Project Overview
 

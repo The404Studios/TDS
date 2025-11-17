@@ -16,6 +16,14 @@ This will create:
 - `dependencies/enet/` - NAT punchthrough (optional)
 - `resources/` folders for your assets
 
+**Verify everything downloaded correctly** (optional but recommended):
+
+```cmd
+verify_build_env.bat
+```
+
+If it shows **[SUCCESS] Environment is ready to build!** you can proceed!
+
 ## Step 2: Build the Project
 
 ### Option A: Visual Studio (Recommended)
@@ -216,29 +224,31 @@ NAT punchthrough enables:
 
 ## Troubleshooting
 
-### "Failed to load model"
-- **Solution**: The game uses placeholder models automatically. No custom models needed!
-- Check console for: `[INFO] Using placeholder player model`
+### Common Issues - Quick Fixes
 
-### "Failed to connect to server"
-- **Solution**: Make sure server is running first
-- Check server console shows: `[Server] Server started on port 7777`
-- Check firewall allows port 7777
+**"Failed to load model"**
+→ The game uses placeholder models automatically. No custom models needed!
 
-### Low FPS / Performance Issues
-- **Solution**: Use Release build (not Debug)
-- Lower screen resolution in code (default 1280x720)
-- Reduce polygon count on custom models
+**"Failed to connect to server"**
+→ Make sure server is running first. Check server console shows: `[Server] Server started on port 7777`
 
-### Animation Not Playing
-- **Solution**: Check frame ranges in `AnimationController.h`
-- Verify animations are embedded in glTF file
-- Check console for animation loading messages
+**Build errors / "Cannot find raylib.h"**
+→ Run `download_dependencies.bat` first! Then verify with `verify_build_env.bat`
 
-### No Sound
-- **Solution**: Placeholder sounds are auto-generated
-- Verify Windows audio device is working
-- Check volume settings in-game (default 70%)
+**Low FPS**
+→ Use Release build (not Debug) and ensure GPU drivers are up to date
+
+**No Sound**
+→ Placeholder sounds are auto-generated. Check Windows audio device is working.
+
+### Need More Help?
+
+See **TROUBLESHOOTING.md** for comprehensive solutions to 20+ common issues including:
+- Build and compilation errors
+- Runtime crashes and errors
+- Networking problems
+- Performance optimization
+- Custom model/animation issues
 
 ---
 
