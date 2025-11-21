@@ -50,7 +50,8 @@ This is a complete multiplayer extraction shooter featuring:
 | Document | Description |
 |----------|-------------|
 | **[QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)** | ⭐ **Start here!** - 5-minute setup (Windows) |
-| **[BUILD_LINUX.md](BUILD_LINUX.md)** | 🐧 **Linux/Kali build guide** - Complete Linux setup |
+| **[KALI_QUICK_START.md](KALI_QUICK_START.md)** | 🐧 **Kali Linux quick start** - 10-minute Kali setup |
+| **[BUILD_LINUX.md](BUILD_LINUX.md)** | 🐧 **Linux build guide** - Complete Linux/Kali setup |
 | **[CONTROLS.md](CONTROLS.md)** | Complete game controls reference |
 | **[BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md)** | Detailed build process (Windows) |
 | **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Solutions to 20+ common issues |
