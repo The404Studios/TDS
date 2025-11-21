@@ -44,7 +44,35 @@ Comprehensive solutions to 20+ common issues.
 
 ---
 
+## Gameplay & Controls
+
+### 🎮 [CONTROLS.md](CONTROLS.md)
+Complete control reference for players.
+- Movement, combat, and interaction controls
+- UI navigation and hotkeys
+- HUD elements explained
+- Control customization guide
+- Tips and tricks for gameplay
+- Quick reference control card
+
+**For**: Players learning the game, creating control overlays
+
+---
+
 ## Development & Testing
+
+### 🤝 [CONTRIBUTING.md](CONTRIBUTING.md)
+Developer's guide to contributing code.
+- Development setup and workflow
+- Code structure and standards
+- Making changes and testing
+- Common development tasks
+- Debugging tips
+- Pull request guidelines
+
+**For**: Developers wanting to modify or contribute
+
+---
 
 ### 🎮 [MULTIPLAYER_TESTING_GUIDE.md](MULTIPLAYER_TESTING_GUIDE.md)
 How to test multiplayer features.
@@ -69,7 +97,7 @@ Technical documentation for the raylib client.
 - Code structure
 - API reference
 
-**For**: Understanding the codebase, contributing code
+**For**: Understanding the codebase, technical reference
 
 ---
 
@@ -181,6 +209,12 @@ Server configuration file.
 2. [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Low FPS section
 3. [server_config.ini](server_config.ini) - Performance section
 
+#### ...learn the controls
+→ [CONTROLS.md](CONTROLS.md) - Complete control reference
+
+#### ...contribute code
+→ [CONTRIBUTING.md](CONTRIBUTING.md) - Developer contribution guide
+
 ---
 
 ## Documentation by Audience
@@ -188,12 +222,19 @@ Server configuration file.
 ### 🆕 New Users (Never used this project)
 1. [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)
 2. Run `setup_and_run.bat`
-3. If issues: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+3. [CONTROLS.md](CONTROLS.md) - Learn the controls
+4. If issues: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
+### 🎮 Players (Want to play the game)
+1. [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) - Setup
+2. [CONTROLS.md](CONTROLS.md) - Learn controls
+3. [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Fix issues
 
 ### 💻 Developers (Want to modify code)
 1. [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md)
-2. [RAYLIB_README.md](RAYLIB_README.md)
-3. [MULTIPLAYER_TESTING_GUIDE.md](MULTIPLAYER_TESTING_GUIDE.md)
+2. [CONTRIBUTING.md](CONTRIBUTING.md)
+3. [RAYLIB_README.md](RAYLIB_README.md)
+4. [MULTIPLAYER_TESTING_GUIDE.md](MULTIPLAYER_TESTING_GUIDE.md)
 4. Use `dev_tools.bat` for development workflow
 
 ### 🖥️ Server Administrators (Hosting servers)
@@ -218,10 +259,13 @@ Server configuration file.
 
 ```
 TDS/
-├── docs/                           # Documentation
+├── *.md                           # Documentation (root directory)
+│   ├── README.md                  # Project overview
 │   ├── QUICK_START_GUIDE.md       # ⭐ Start here!
 │   ├── BUILD_INSTRUCTIONS.md      # Build process
 │   ├── TROUBLESHOOTING.md         # Problem solutions
+│   ├── CONTROLS.md                # Game controls reference
+│   ├── CONTRIBUTING.md            # Developer guide
 │   ├── MULTIPLAYER_TESTING_GUIDE.md  # Testing guide
 │   ├── DEPLOYMENT_GUIDE.md        # Production deployment
 │   ├── RAYLIB_README.md           # Technical docs

@@ -40,8 +40,10 @@ This is a complete multiplayer extraction shooter featuring:
 | Document | Description |
 |----------|-------------|
 | **[QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)** | ⭐ **Start here!** - 5-minute setup |
+| **[CONTROLS.md](CONTROLS.md)** | Complete game controls reference |
 | **[BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md)** | Detailed build process |
 | **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Solutions to 20+ common issues |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Developer contribution guide |
 | **[MULTIPLAYER_TESTING_GUIDE.md](MULTIPLAYER_TESTING_GUIDE.md)** | Testing multiplayer features |
 | **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** | Deploy to production servers |
 | **[RAYLIB_README.md](RAYLIB_README.md)** | Technical documentation |
