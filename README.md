@@ -6,6 +6,7 @@ A multiplayer extraction-based FPS game inspired by Escape from Tarkov, featurin
 
 **New to this project? Get started in 5 minutes:**
 
+### Windows
 ```cmd
 # 1. Download dependencies (raylib, raygui, ENet)
 download_dependencies.bat
@@ -14,9 +15,18 @@ download_dependencies.bat
 setup_and_run.bat
 ```
 
+### Linux / Kali Linux
+```bash
+# 1. Download dependencies
+./download_dependencies.sh
+
+# 2. Build and run automatically
+./setup_and_run.sh
+```
+
 **That's it!** The game will launch with server + client.
 
-**📚 [Full Quick Start Guide →](QUICK_START_GUIDE.md)**
+**📚 [Full Quick Start Guide →](QUICK_START_GUIDE.md)** | **🐧 [Linux Build Guide →](BUILD_LINUX.md)**
 
 ---
 
@@ -39,9 +49,10 @@ This is a complete multiplayer extraction shooter featuring:
 
 | Document | Description |
 |----------|-------------|
-| **[QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)** | ⭐ **Start here!** - 5-minute setup |
+| **[QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)** | ⭐ **Start here!** - 5-minute setup (Windows) |
+| **[BUILD_LINUX.md](BUILD_LINUX.md)** | 🐧 **Linux/Kali build guide** - Complete Linux setup |
 | **[CONTROLS.md](CONTROLS.md)** | Complete game controls reference |
-| **[BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md)** | Detailed build process |
+| **[BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md)** | Detailed build process (Windows) |
 | **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Solutions to 20+ common issues |
 | **[CONTRIBUTING.md](CONTRIBUTING.md)** | Developer contribution guide |
 | **[MULTIPLAYER_TESTING_GUIDE.md](MULTIPLAYER_TESTING_GUIDE.md)** | Testing multiplayer features |
@@ -55,12 +66,12 @@ This is a complete multiplayer extraction shooter featuring:
 
 ```
 TDS/
-├── *.bat                              # Utility scripts
-│   ├── download_dependencies.bat      # Download raylib/raygui/ENet
-│   ├── verify_build_env.bat           # Check build environment
-│   ├── setup_and_run.bat              # One-click setup & run
-│   ├── run_game.bat                   # Quick launcher (multiple clients)
-│   └── dev_tools.bat                  # Developer tools menu
+├── *.bat / *.sh                       # Utility scripts (Windows / Linux)
+│   ├── download_dependencies.*        # Download raylib/raygui/ENet
+│   ├── verify_build_env.*             # Check build environment
+│   ├── setup_and_run.*                # One-click setup & run
+│   ├── run_game.*                     # Quick launcher (multiple clients)
+│   └── dev_tools.*                    # Developer tools menu
 │
 ├── *.md                               # Documentation
 │   ├── QUICK_START_GUIDE.md           # 5-minute setup guide
@@ -124,11 +135,12 @@ TDS/
 │   ├── ExtractionShooterRaylib.exe    # Raylib client ⭐
 │   └── NatPunchServer.exe             # NAT server
 │
-├── ExtractionShooter.sln              # Visual Studio solution
-├── ExtractionShooterRaylib.vcxproj    # Raylib client project ⭐
-├── ExtractionShooterServer.vcxproj    # Server project
-├── NatPunchServer.vcxproj             # NAT server project
-├── ExtractionShooterClient.vcxproj    # Legacy OpenGL client
+├── ExtractionShooter.sln              # Visual Studio solution (Windows)
+├── ExtractionShooterRaylib.vcxproj    # Raylib client project (Windows)
+├── ExtractionShooterServer.vcxproj    # Server project (Windows)
+├── NatPunchServer.vcxproj             # NAT server project (Windows)
+├── ExtractionShooterClient.vcxproj    # Legacy OpenGL client (Windows)
+├── CMakeLists.txt                     # CMake build system (Linux/Cross-platform) ⭐
 └── server_config.ini                  # Server configuration
 ```
 
