@@ -1,7 +1,7 @@
 // Extraction Shooter - Raylib Client Entry Point
 // 3D Multiplayer Looter Shooter with raylib, raygui, and NAT punchthrough
 
-#include "raylib.h"
+#include "RaylibPlatform.h"  // Platform-aware raylib header
 #include "RaylibGameClient.h"
 #include "network/NetworkClient.h"
 #include "../natpunch/NatPunchClient.h"

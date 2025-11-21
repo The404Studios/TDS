@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "raylib.h"
+#include "../RaylibPlatform.h"  // Platform-aware raylib header
 #include <unordered_map>
 #include <string>
 

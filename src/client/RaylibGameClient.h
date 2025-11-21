@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "raylib.h"
+// Use platform-aware raylib header to avoid Windows conflicts
+#include "RaylibPlatform.h"
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
