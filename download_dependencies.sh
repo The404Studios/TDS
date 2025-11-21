@@ -56,8 +56,8 @@ else
     echo -e "${GREEN}✓ raygui already exists${NC}"
 fi
 
-# Download ENet (optional)
-echo -e "${YELLOW}[3/3] Downloading ENet...${NC}"
+# Download ENet
+echo -e "${YELLOW}[3/7] Downloading ENet...${NC}"
 if [ ! -d "enet" ]; then
     # Clone ENet
     git clone --depth 1 https://github.com/lsalzman/enet.git
@@ -74,6 +74,56 @@ else
     echo -e "${GREEN}✓ ENet already exists${NC}"
 fi
 
+# Download ImGui
+echo -e "${YELLOW}[4/7] Downloading ImGui...${NC}"
+if [ ! -d "imgui" ]; then
+    git clone --depth 1 --branch docking https://github.com/ocornut/imgui.git
+    echo -e "${GREEN}✓ ImGui downloaded${NC}"
+else
+    echo -e "${GREEN}✓ ImGui already exists${NC}"
+fi
+
+# Download nlohmann/json
+echo -e "${YELLOW}[5/7] Downloading nlohmann/json...${NC}"
+if [ ! -d "json" ]; then
+    mkdir -p json
+    cd json
+    wget -q https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
+    mkdir -p nlohmann
+    mv json.hpp nlohmann/
+    cd ..
+    echo -e "${GREEN}✓ nlohmann/json downloaded${NC}"
+else
+    echo -e "${GREEN}✓ nlohmann/json already exists${NC}"
+fi
+
+# Download spdlog
+echo -e "${YELLOW}[6/7] Downloading spdlog...${NC}"
+if [ ! -d "spdlog" ]; then
+    git clone --depth 1 --branch v1.x https://github.com/gabime/spdlog.git
+    cd spdlog
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make -j$(nproc)
+    cd ../..
+    echo -e "${GREEN}✓ spdlog downloaded and built${NC}"
+else
+    echo -e "${GREEN}✓ spdlog already exists${NC}"
+fi
+
+# Download LZ4
+echo -e "${YELLOW}[7/7] Downloading LZ4...${NC}"
+if [ ! -d "lz4" ]; then
+    git clone --depth 1 https://github.com/lz4/lz4.git
+    cd lz4
+    make
+    cd ..
+    echo -e "${GREEN}✓ LZ4 downloaded and built${NC}"
+else
+    echo -e "${GREEN}✓ LZ4 already exists${NC}"
+fi
+
 cd ..
 
 # Create resource directories
@@ -82,6 +132,8 @@ echo -e "${YELLOW}Creating resource directories...${NC}"
 mkdir -p resources/models
 mkdir -p resources/sounds
 mkdir -p resources/textures
+mkdir -p resources/shaders
+mkdir -p resources/animations
 echo -e "${GREEN}✓ Resource directories created${NC}"
 
 # Create Data directory for server
@@ -92,6 +144,15 @@ echo ""
 echo "========================================"
 echo -e "${GREEN}  Dependencies Downloaded Successfully!${NC}"
 echo "========================================"
+echo ""
+echo "Dependencies installed:"
+echo "  - raylib 5.0 (3D graphics engine)"
+echo "  - raygui (UI library)"
+echo "  - ENet (NAT punchthrough)"
+echo "  - ImGui (Advanced debugging UI)"
+echo "  - nlohmann/json (JSON configuration)"
+echo "  - spdlog (Professional logging)"
+echo "  - LZ4 (Fast compression)"
 echo ""
 echo "Next steps:"
 echo "  1. Run: ./verify_build_env.sh"
